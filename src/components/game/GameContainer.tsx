@@ -6,7 +6,6 @@ import { DecisionPanel } from './DecisionPanel';
 import { MonthSummary } from './MonthSummary';
 import { GameEndScreen } from './GameEndScreen';
 import { GameHeader } from './GameHeader';
-import { YearEndScreen } from './YearEndScreen';
 
 export const GameContainer = () => {
   const {
@@ -20,25 +19,12 @@ export const GameContainer = () => {
     takeLoan,
     endMonth,
     continueToNextMonth,
-    continueToNextYear,
     getGameResult,
-    getInsuranceCost,
   } = useGameState();
 
   // Intro screen
   if (gameState.gamePhase === 'intro') {
-    return <IntroScreen onStart={startGame} currentGoal={gameState.currentGoal} />;
-  }
-
-  // Year end screen
-  if (gameState.gamePhase === 'yearEnd') {
-    return (
-      <YearEndScreen
-        gameState={gameState}
-        onContinueNextYear={continueToNextYear}
-        onRestart={resetGame}
-      />
-    );
+    return <IntroScreen onStart={startGame} />;
   }
 
   // Game ended screen
@@ -56,11 +42,7 @@ export const GameContainer = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto px-4 pb-8">
-        <GameHeader 
-          month={gameState.month} 
-          year={gameState.year}
-          onReset={resetGame} 
-        />
+        <GameHeader month={gameState.month} onReset={resetGame} />
 
         {/* Dashboard view */}
         {gameState.gamePhase === 'playing' && (
@@ -92,7 +74,6 @@ export const GameContainer = () => {
               balance={gameState.balance}
               hasInsurance={gameState.hasInsurance}
               debt={gameState.debt}
-              insuranceCost={getInsuranceCost()}
               onSave={saveMoney}
               onBuyInsurance={buyInsurance}
               onTakeLoan={takeLoan}

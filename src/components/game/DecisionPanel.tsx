@@ -6,7 +6,6 @@ interface DecisionPanelProps {
   balance: number;
   hasInsurance: boolean;
   debt: number;
-  insuranceCost?: number;
   onSave: (amount: number) => void;
   onBuyInsurance: () => void;
   onTakeLoan: (amount: number) => void;
@@ -17,7 +16,6 @@ export const DecisionPanel = ({
   balance,
   hasInsurance,
   debt,
-  insuranceCost = 500,
   onSave,
   onBuyInsurance,
   onTakeLoan,
@@ -86,7 +84,7 @@ export const DecisionPanel = ({
           </div>
           <div className="flex-1">
             <h3 className="font-bold text-foreground">Crop Insurance</h3>
-            <p className="text-xs text-muted-foreground">Protect against crop loss (₹{insuranceCost.toLocaleString()}/month)</p>
+            <p className="text-xs text-muted-foreground">Protect against crop loss (₹500/month)</p>
           </div>
           {hasInsurance && (
             <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold">
@@ -97,13 +95,13 @@ export const DecisionPanel = ({
 
         <button
           onClick={onBuyInsurance}
-          disabled={hasInsurance || balance < insuranceCost}
+          disabled={hasInsurance || balance < 500}
           className={cn(
             'btn-game w-full bg-blue-500 text-white hover:bg-blue-600',
-            (hasInsurance || balance < insuranceCost) && 'opacity-50 cursor-not-allowed'
+            (hasInsurance || balance < 500) && 'opacity-50 cursor-not-allowed'
           )}
         >
-          {hasInsurance ? '✓ Already Insured' : `Buy Insurance - ₹${insuranceCost.toLocaleString()}`}
+          {hasInsurance ? '✓ Already Insured' : 'Buy Insurance - ₹500'}
         </button>
       </div>
 

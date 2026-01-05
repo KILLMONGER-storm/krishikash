@@ -1,22 +1,4 @@
-export interface SavingGoal {
-  id: string;
-  name: string;
-  targetAmount: number;
-  icon: string;
-  description: string;
-}
-
-export const SAVING_GOALS: SavingGoal[] = [
-  { id: 'bicycle', name: 'Bicycle', targetAmount: 5000, icon: '🚲', description: 'A bicycle for easier transport' },
-  { id: 'phone', name: 'Smartphone', targetAmount: 8000, icon: '📱', description: 'A smartphone for market prices' },
-  { id: 'motorcycle', name: 'Motorcycle', targetAmount: 15000, icon: '🏍️', description: 'A motorcycle for the family' },
-  { id: 'tractor', name: 'Mini Tractor', targetAmount: 25000, icon: '🚜', description: 'Equipment to boost farming' },
-  { id: 'house', name: 'House Renovation', targetAmount: 40000, icon: '🏠', description: 'Improve your home' },
-  { id: 'land', name: 'Extra Land', targetAmount: 60000, icon: '🌾', description: 'Buy more farmland' },
-];
-
 export interface GameState {
-  year: number;
   month: number;
   balance: number;
   monthlyIncome: number;
@@ -26,22 +8,9 @@ export interface GameState {
   debt: number;
   consecutiveSavingMonths: number;
   totalSavedThisStreak: number;
-  gamePhase: 'intro' | 'playing' | 'event' | 'decision' | 'summary' | 'yearEnd' | 'ended';
+  gamePhase: 'intro' | 'playing' | 'event' | 'decision' | 'summary' | 'ended';
   currentEvent: GameEvent | null;
   monthHistory: MonthRecord[];
-  currentGoal: SavingGoal | null;
-  completedGoals: string[];
-  yearHistory: YearRecord[];
-  difficultyMultiplier: number;
-}
-
-export interface YearRecord {
-  year: number;
-  finalSavings: number;
-  finalIncome: number;
-  finalStabilityScore: number;
-  goalCompleted: boolean;
-  goalName: string;
 }
 
 export interface GameEvent {
@@ -85,7 +54,6 @@ export const FIXED_EXPENSES: FixedExpenses = {
 };
 
 export const INITIAL_GAME_STATE: GameState = {
-  year: 1,
   month: 1,
   balance: 0,
   monthlyIncome: 12000,
@@ -98,10 +66,6 @@ export const INITIAL_GAME_STATE: GameState = {
   gamePhase: 'intro',
   currentEvent: null,
   monthHistory: [],
-  currentGoal: SAVING_GOALS[0],
-  completedGoals: [],
-  yearHistory: [],
-  difficultyMultiplier: 1,
 };
 
 export const GAME_EVENTS: GameEvent[] = [

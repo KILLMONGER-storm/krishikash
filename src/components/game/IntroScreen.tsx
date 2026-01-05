@@ -1,12 +1,10 @@
 import { Sprout, Target, TrendingUp, Shield } from 'lucide-react';
-import { SavingGoal } from '@/types/game';
 
 interface IntroScreenProps {
   onStart: () => void;
-  currentGoal: SavingGoal | null;
 }
 
-export const IntroScreen = ({ onStart, currentGoal }: IntroScreenProps) => {
+export const IntroScreen = ({ onStart }: IntroScreenProps) => {
   return (
     <div className="min-h-screen gradient-hero flex flex-col items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-8 animate-slide-up">
@@ -19,28 +17,9 @@ export const IntroScreen = ({ onStart, currentGoal }: IntroScreenProps) => {
             KrishiCash
           </h1>
           <p className="text-lg text-muted-foreground">
-            A Multi-Year Farmer Finance Journey
+            A 12-Month Farmer Finance Game
           </p>
         </div>
-
-        {/* First Year Goal */}
-        {currentGoal && (
-          <div className="game-card border-2 border-primary/30 bg-primary/5">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-4xl">{currentGoal.icon}</span>
-              <div className="text-left">
-                <h3 className="font-bold text-foreground">Year 1 Goal</h3>
-                <p className="text-primary font-semibold">{currentGoal.name}</p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">{currentGoal.description}</p>
-            <div className="mt-3 p-2 bg-primary/10 rounded-lg">
-              <p className="text-sm font-bold text-primary">
-                Target: ₹{currentGoal.targetAmount.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Game Description */}
         <div className="game-card text-left">
@@ -51,8 +30,8 @@ export const IntroScreen = ({ onStart, currentGoal }: IntroScreenProps) => {
                 <Target className="w-4 h-4 text-amber-600" />
               </div>
               <div>
-                <p className="font-semibold text-foreground">Complete 12 Months</p>
-                <p className="text-sm text-muted-foreground">Make smart decisions to reach your yearly goal</p>
+                <p className="font-semibold text-foreground">Manage 12 Months</p>
+                <p className="text-sm text-muted-foreground">Make smart financial decisions each month</p>
               </div>
             </div>
             <div className="flex gap-3">
@@ -60,8 +39,8 @@ export const IntroScreen = ({ onStart, currentGoal }: IntroScreenProps) => {
                 <TrendingUp className="w-4 h-4 text-emerald-600" />
               </div>
               <div>
-                <p className="font-semibold text-foreground">Progress Through Years</p>
-                <p className="text-sm text-muted-foreground">Each year brings bigger goals & challenges</p>
+                <p className="font-semibold text-foreground">Save & Grow</p>
+                <p className="text-sm text-muted-foreground">Regular saving unlocks income bonuses</p>
               </div>
             </div>
             <div className="flex gap-3">
@@ -82,10 +61,10 @@ export const IntroScreen = ({ onStart, currentGoal }: IntroScreenProps) => {
             onClick={onStart}
             className="btn-primary-game w-full text-lg py-4"
           >
-            Start Year 1 🌾
+            Start Your Journey 🌾
           </button>
           <p className="text-xs text-muted-foreground">
-            Can you complete all 6 goals and become a Master Farmer?
+            Learn financial skills through real-life scenarios
           </p>
         </div>
 
