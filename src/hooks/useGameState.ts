@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { GameState, GameEvent, INITIAL_GAME_STATE, FIXED_EXPENSES, GAME_EVENTS, MonthRecord } from '@/types/game';
+import { GameState, GameEvent, INITIAL_GAME_STATE, FIXED_EXPENSES, GAME_EVENTS, MonthRecord, SAVING_GOALS, YearRecord } from '@/types/game';
 
 const STORAGE_KEY = 'krishicash_game_state';
 
@@ -33,14 +33,35 @@ export const useGameState = () => {
     }));
   }, []);
 
+  const getScaledExpenses = useCallback(() => {
+    const multiplier = gameState.difficultyMultiplier;
+    return {
+      household: Math.round(FIXED_EXPENSES.household * multiplier),
+      farming: Math.round(FIXED_EXPENSES.farming * multiplier),
+      education: Math.round(FIXED_EXPENSES.education * multiplier),
+    };
+  }, [gameState.difficultyMultiplier]);
+
   const getTotalExpenses = useCallback(() => {
-    return FIXED_EXPENSES.household + FIXED_EXPENSES.farming + FIXED_EXPENSES.education;
-  }, []);
+    const expenses = getScaledExpenses();
+    return expenses.household + expenses.farming + expenses.education;
+  }, [getScaledExpenses]);
 
   const getRandomEvent = useCallback((): GameEvent => {
     const randomIndex = Math.floor(Math.random() * GAME_EVENTS.length);
-    return { ...GAME_EVENTS[randomIndex] };
-  }, []);
+    const event = { ...GAME_EVENTS[randomIndex] };
+    
+    // Scale event costs/rewards with difficulty
+    const multiplier = gameState.difficultyMultiplier;
+    if (event.cost) {
+      event.cost = Math.round(event.cost * multiplier);
+    }
+    if (event.reward) {
+      event.reward = Math.round(event.reward * (0.8 + multiplier * 0.2)); // Rewards scale slower
+    }
+    
+    return event;
+  }, [gameState.difficultyMultiplier]);
 
   const startNewMonth = useCallback(() => {
     setGameState(prev => {
@@ -116,7 +137,7 @@ export const useGameState = () => {
   }, []);
 
   const buyInsurance = useCallback(() => {
-    const insuranceCost = 500;
+    const insuranceCost = Math.round(500 * gameState.difficultyMultiplier);
     setGameState(prev => {
       if (prev.balance < insuranceCost || prev.hasInsurance) return prev;
 
@@ -127,34 +148,17 @@ export const useGameState = () => {
         stabilityScore: Math.min(100, prev.stabilityScore + 3),
       };
     });
-  }, []);
+  }, [gameState.difficultyMultiplier]);
 
   const takeLoan = useCallback((amount: number) => {
     setGameState(prev => {
-      const interest = amount * 0.2;
+      const interest = amount * (0.2 + (prev.difficultyMultiplier - 1) * 0.05); // Interest increases with difficulty
       return {
         ...prev,
         balance: prev.balance + amount,
         debt: prev.debt + amount + interest,
         stabilityScore: Math.max(0, prev.stabilityScore - 10),
       };
-    });
-  }, []);
-
-  const checkIncomeGrowth = useCallback(() => {
-    setGameState(prev => {
-      // If saved 2000+ for 3 consecutive months
-      if (prev.consecutiveSavingMonths >= 3 && prev.totalSavedThisStreak >= 6000) {
-        return {
-          ...prev,
-          monthlyIncome: prev.monthlyIncome + 1500,
-          stabilityScore: Math.min(100, prev.stabilityScore + 10),
-          consecutiveSavingMonths: 0,
-          totalSavedThisStreak: 0,
-          savings: prev.savings - 6000, // Use savings for investment
-        };
-      }
-      return prev;
     });
   }, []);
 
@@ -177,18 +181,19 @@ export const useGameState = () => {
       if (prev.consecutiveSavingMonths >= 3 && prev.totalSavedThisStreak >= 6000) {
         updatedState = {
           ...updatedState,
-          monthlyIncome: prev.monthlyIncome + 1500,
+          monthlyIncome: prev.monthlyIncome + Math.round(1500 * prev.difficultyMultiplier),
           stabilityScore: Math.min(100, prev.stabilityScore + 10),
           consecutiveSavingMonths: 0,
           totalSavedThisStreak: 0,
         };
       }
 
+      // Year ended - go to year end screen
       if (newMonth > 12) {
         return {
           ...updatedState,
           month: 12,
-          gamePhase: 'ended',
+          gamePhase: 'yearEnd',
           currentEvent: null,
           monthHistory: [...prev.monthHistory, record],
         };
@@ -213,27 +218,94 @@ export const useGameState = () => {
     }));
   }, []);
 
-  const getGameResult = useCallback(() => {
-    if (gameState.stabilityScore > 80) {
+  const continueToNextYear = useCallback(() => {
+    setGameState(prev => {
+      const goalCompleted = prev.currentGoal ? prev.savings >= prev.currentGoal.targetAmount : false;
+      
+      // Record year history
+      const yearRecord: YearRecord = {
+        year: prev.year,
+        finalSavings: prev.savings,
+        finalIncome: prev.monthlyIncome,
+        finalStabilityScore: prev.stabilityScore,
+        goalCompleted,
+        goalName: prev.currentGoal?.name || 'None',
+      };
+
+      // Find next goal
+      const completedGoalIds = goalCompleted && prev.currentGoal 
+        ? [...prev.completedGoals, prev.currentGoal.id]
+        : prev.completedGoals;
+      
+      const nextGoal = SAVING_GOALS.find(g => !completedGoalIds.includes(g.id)) || null;
+      
+      // Calculate new difficulty
+      const newDifficulty = prev.difficultyMultiplier + 0.15; // 15% harder each year
+      
+      // Calculate savings carry-over (keep excess after completing goal)
+      let newSavings = prev.savings;
+      if (goalCompleted && prev.currentGoal) {
+        newSavings = Math.max(0, prev.savings - prev.currentGoal.targetAmount);
+      }
+
+      // If no more goals, game ends
+      if (!nextGoal) {
+        return {
+          ...prev,
+          gamePhase: 'ended',
+          yearHistory: [...prev.yearHistory, yearRecord],
+          completedGoals: completedGoalIds,
+        };
+      }
+
       return {
-        title: 'Financially Secure Farmer! 🌟',
-        description: 'Excellent! You managed your finances wisely and built a stable future.',
+        ...prev,
+        year: prev.year + 1,
+        month: 1,
+        savings: newSavings,
+        hasInsurance: false,
+        debt: prev.debt, // Debt carries over
+        consecutiveSavingMonths: 0,
+        totalSavedThisStreak: 0,
+        gamePhase: 'playing',
+        currentEvent: null,
+        monthHistory: [],
+        currentGoal: nextGoal,
+        completedGoals: completedGoalIds,
+        yearHistory: [...prev.yearHistory, yearRecord],
+        difficultyMultiplier: newDifficulty,
+      };
+    });
+  }, []);
+
+  const getGameResult = useCallback(() => {
+    const totalYears = gameState.yearHistory.length + 1;
+    const completedGoalsCount = gameState.completedGoals.length;
+    
+    if (gameState.stabilityScore > 80 && completedGoalsCount >= 3) {
+      return {
+        title: 'Master Farmer! 🏆',
+        description: `Incredible! You completed ${completedGoalsCount} goals across ${totalYears} year${totalYears > 1 ? 's' : ''}!`,
         color: 'success' as const,
       };
-    } else if (gameState.stabilityScore > 50) {
+    } else if (gameState.stabilityScore > 50 && completedGoalsCount >= 1) {
       return {
-        title: 'Stable but Needs Improvement 📊',
-        description: 'You did okay, but there\'s room to improve your financial habits.',
+        title: 'Successful Farmer! 🌟',
+        description: `Well done! You achieved ${completedGoalsCount} goal${completedGoalsCount > 1 ? 's' : ''} and maintained stability.`,
         color: 'warning' as const,
       };
     } else {
       return {
-        title: 'Financially Vulnerable ⚠️',
-        description: 'Your finances need attention. Try saving more and avoiding debt.',
+        title: 'Keep Trying! 💪',
+        description: 'Financial mastery takes practice. Save more and avoid debt!',
         color: 'destructive' as const,
       };
     }
-  }, [gameState.stabilityScore]);
+  }, [gameState.stabilityScore, gameState.yearHistory.length, gameState.completedGoals.length]);
+
+  const getInsuranceCost = useCallback(() => {
+    return Math.round(500 * gameState.difficultyMultiplier);
+  }, [gameState.difficultyMultiplier]);
 
   return {
     gameState,
@@ -246,8 +318,10 @@ export const useGameState = () => {
     takeLoan,
     endMonth,
     continueToNextMonth,
+    continueToNextYear,
     getGameResult,
     getTotalExpenses,
-    checkIncomeGrowth,
+    getScaledExpenses,
+    getInsuranceCost,
   };
 };
