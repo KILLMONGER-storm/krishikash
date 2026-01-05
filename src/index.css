@@ -2,95 +2,108 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Earthy, warm palette for rural finance game */
+    --background: 45 30% 96%;
+    --foreground: 30 20% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 45 40% 98%;
+    --card-foreground: 30 20% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 45 40% 98%;
+    --popover-foreground: 30 20% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Earthy Green (growth, crops) */
+    --primary: 142 45% 38%;
+    --primary-foreground: 45 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Warm Sand/Tan */
+    --secondary: 35 35% 85%;
+    --secondary-foreground: 30 20% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted: Soft earth tones */
+    --muted: 35 20% 90%;
+    --muted-foreground: 30 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Golden Amber (money, success) */
+    --accent: 38 92% 50%;
+    --accent-foreground: 30 20% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Success: Bright Green */
+    --success: 142 70% 45%;
+    --success-foreground: 45 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Warning: Warm Orange */
+    --warning: 25 95% 53%;
+    --warning-foreground: 30 20% 15%;
 
-    --radius: 0.5rem;
+    /* Destructive: Soft Red */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 45 40% 98%;
 
-    --sidebar-background: 0 0% 98%;
+    --border: 35 25% 82%;
+    --input: 35 25% 85%;
+    --ring: 142 45% 38%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --radius: 1rem;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Game-specific colors */
+    --money: 38 92% 50%;
+    --savings: 142 70% 45%;
+    --debt: 0 72% 51%;
+    --stability: 199 89% 48%;
+    --income: 142 45% 38%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(142 45% 38%), hsl(142 55% 45%));
+    --gradient-money: linear-gradient(135deg, hsl(38 92% 50%), hsl(45 100% 60%));
+    --gradient-card: linear-gradient(180deg, hsl(45 40% 98%), hsl(45 30% 94%));
+    --gradient-hero: linear-gradient(180deg, hsl(35 35% 85%), hsl(45 30% 96%));
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Shadows */
+    --shadow-card: 0 4px 20px -4px hsl(30 20% 15% / 0.08);
+    --shadow-elevated: 0 8px 30px -8px hsl(30 20% 15% / 0.15);
+    --shadow-glow-money: 0 0 20px hsl(38 92% 50% / 0.3);
+    --shadow-glow-success: 0 0 20px hsl(142 70% 45% / 0.3);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 30 20% 10%;
+    --foreground: 45 30% 96%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 30 18% 14%;
+    --card-foreground: 45 30% 96%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 30 18% 14%;
+    --popover-foreground: 45 30% 96%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 142 50% 50%;
+    --primary-foreground: 30 20% 10%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 30 15% 22%;
+    --secondary-foreground: 45 30% 96%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 30 15% 20%;
+    --muted-foreground: 35 15% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 38 92% 55%;
+    --accent-foreground: 30 20% 10%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --success: 142 70% 50%;
+    --success-foreground: 30 20% 10%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --warning: 25 95% 58%;
+    --warning-foreground: 30 20% 10%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 45 40% 98%;
+
+    --border: 30 15% 25%;
+    --input: 30 15% 25%;
+    --ring: 142 50% 50%;
   }
 }
 
@@ -100,6 +113,166 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Nunito', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Nunito', system-ui, sans-serif;
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .game-card {
+    @apply bg-card rounded-2xl p-5 border border-border;
+    box-shadow: var(--shadow-card);
+    background: var(--gradient-card);
+  }
+
+  .stat-card {
+    @apply game-card flex flex-col items-center justify-center text-center gap-1 p-4;
+  }
+
+  .money-glow {
+    box-shadow: var(--shadow-glow-money);
+  }
+
+  .success-glow {
+    box-shadow: var(--shadow-glow-success);
+  }
+
+  .progress-bar {
+    @apply h-3 rounded-full bg-muted overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+  }
+
+  .btn-game {
+    @apply px-6 py-3 rounded-xl font-bold text-base transition-all duration-200;
+    @apply active:scale-95 hover:scale-[1.02];
+  }
+
+  .btn-primary-game {
+    @apply btn-game bg-primary text-primary-foreground;
+    @apply hover:shadow-lg;
+  }
+
+  .btn-money {
+    @apply btn-game text-accent-foreground;
+    background: var(--gradient-money);
+    @apply hover:brightness-105;
+  }
+
+  .btn-success {
+    @apply btn-game bg-success text-success-foreground;
+    @apply hover:brightness-105;
+  }
+
+  .btn-warning {
+    @apply btn-game bg-warning text-warning-foreground;
+    @apply hover:brightness-105;
+  }
+
+  .btn-outline-game {
+    @apply btn-game bg-transparent border-2 border-primary text-primary;
+    @apply hover:bg-primary hover:text-primary-foreground;
+  }
+}
+
+@layer utilities {
+  .text-money {
+    color: hsl(var(--money));
+  }
+
+  .text-savings {
+    color: hsl(var(--savings));
+  }
+
+  .text-debt {
+    color: hsl(var(--debt));
+  }
+
+  .text-stability {
+    color: hsl(var(--stability));
+  }
+
+  .bg-money {
+    background-color: hsl(var(--money));
+  }
+
+  .bg-savings {
+    background-color: hsl(var(--savings));
+  }
+
+  .bg-debt {
+    background-color: hsl(var(--debt));
+  }
+
+  .bg-stability {
+    background-color: hsl(var(--stability));
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-money {
+    background: var(--gradient-money);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 2s infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 20px hsl(38 92% 50% / 0.3);
+    }
+    50% {
+      opacity: 0.9;
+      box-shadow: 0 0 30px hsl(38 92% 50% / 0.5);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.4s ease-out;
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 }
