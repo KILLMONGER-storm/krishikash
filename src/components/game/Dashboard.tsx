@@ -2,6 +2,7 @@ import { Wallet, PiggyBank, TrendingUp, Heart, AlertTriangle } from 'lucide-reac
 import { StatsCard } from './StatsCard';
 import { ProgressBar } from './ProgressBar';
 import { MonthIndicator } from './MonthIndicator';
+import { GoalCard } from './GoalCard';
 import { GameState, FIXED_EXPENSES } from '@/types/game';
 
 interface DashboardProps {
@@ -10,12 +11,27 @@ interface DashboardProps {
 }
 
 export const Dashboard = ({ gameState, onStartMonth }: DashboardProps) => {
-  const totalExpenses = FIXED_EXPENSES.household + FIXED_EXPENSES.farming + FIXED_EXPENSES.education;
+  const multiplier = gameState.difficultyMultiplier;
+  const scaledExpenses = {
+    household: Math.round(FIXED_EXPENSES.household * multiplier),
+    farming: Math.round(FIXED_EXPENSES.farming * multiplier),
+    education: Math.round(FIXED_EXPENSES.education * multiplier),
+  };
+  const totalExpenses = scaledExpenses.household + scaledExpenses.farming + scaledExpenses.education;
 
   return (
     <div className="space-y-6 animate-slide-up">
       {/* Month Progress */}
       <MonthIndicator currentMonth={gameState.month} />
+
+      {/* Current Goal */}
+      {gameState.currentGoal && (
+        <GoalCard 
+          goal={gameState.currentGoal} 
+          currentSavings={gameState.savings}
+          year={gameState.year}
+        />
+      )}
 
       {/* Stability Score */}
       <div className="game-card">
@@ -31,6 +47,21 @@ export const Dashboard = ({ gameState, onStartMonth }: DashboardProps) => {
           {gameState.stabilityScore <= 50 && '⚠️ Needs attention. Try saving more.'}
         </p>
       </div>
+
+      {/* Difficulty Indicator */}
+      {gameState.year > 1 && (
+        <div className="game-card bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚡</span>
+            <div>
+              <span className="font-bold text-purple-700">Year {gameState.year} Difficulty</span>
+              <p className="text-xs text-purple-600">
+                Expenses & events scaled to {Math.round(multiplier * 100)}%
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3">
@@ -66,15 +97,15 @@ export const Dashboard = ({ gameState, onStartMonth }: DashboardProps) => {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Household Expenses</span>
-            <span className="font-semibold text-foreground">₹{FIXED_EXPENSES.household.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">₹{scaledExpenses.household.toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Farming Costs</span>
-            <span className="font-semibold text-foreground">₹{FIXED_EXPENSES.farming.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">₹{scaledExpenses.farming.toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Education</span>
-            <span className="font-semibold text-foreground">₹{FIXED_EXPENSES.education.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">₹{scaledExpenses.education.toLocaleString()}</span>
           </div>
           <div className="border-t border-border pt-2 mt-2">
             <div className="flex justify-between font-bold">

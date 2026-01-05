@@ -2,10 +2,11 @@ import { Sprout, RotateCcw } from 'lucide-react';
 
 interface GameHeaderProps {
   month: number;
+  year: number;
   onReset: () => void;
 }
 
-export const GameHeader = ({ month, onReset }: GameHeaderProps) => {
+export const GameHeader = ({ month, year, onReset }: GameHeaderProps) => {
   return (
     <header className="flex items-center justify-between py-4 px-2 border-b border-border mb-4">
       <div className="flex items-center gap-2">
@@ -17,7 +18,7 @@ export const GameHeader = ({ month, onReset }: GameHeaderProps) => {
       
       <div className="flex items-center gap-4">
         <span className="text-sm font-semibold text-muted-foreground">
-          Month {month}/12
+          Year {year} • Month {month}/12
         </span>
         <button
           onClick={onReset}
