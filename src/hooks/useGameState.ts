@@ -46,7 +46,12 @@ export const useGameState = () => {
     setGameState(prev => {
       const newBalance = prev.balance + prev.monthlyIncome;
       const expenses = getTotalExpenses();
-      const balanceAfterExpenses = newBalance - expenses;
+      let balanceAfterExpenses = newBalance - expenses;
+      
+      // Auto-deduct insurance if active
+      if (prev.hasInsurance && prev.insuranceAmount > 0) {
+        balanceAfterExpenses -= prev.insuranceAmount;
+      }
       
       // Deduct debt EMI if any
       let debtPayment = 0;
@@ -115,16 +120,37 @@ export const useGameState = () => {
     });
   }, []);
 
-  const buyInsurance = useCallback(() => {
-    const insuranceCost = 500;
+  const buyInsurance = useCallback((amount: number = 500) => {
     setGameState(prev => {
-      if (prev.balance < insuranceCost || prev.hasInsurance) return prev;
+      if (prev.balance < amount) return prev;
 
       return {
         ...prev,
-        balance: prev.balance - insuranceCost,
+        balance: prev.balance - amount,
         hasInsurance: true,
+        insuranceAmount: amount,
         stabilityScore: Math.min(100, prev.stabilityScore + 3),
+      };
+    });
+  }, []);
+
+  const updateInsurance = useCallback((newAmount: number) => {
+    setGameState(prev => {
+      if (!prev.hasInsurance) return prev;
+      
+      return {
+        ...prev,
+        insuranceAmount: newAmount,
+      };
+    });
+  }, []);
+
+  const stopInsurance = useCallback(() => {
+    setGameState(prev => {
+      return {
+        ...prev,
+        hasInsurance: false,
+        insuranceAmount: 0,
       };
     });
   }, []);
@@ -180,13 +206,12 @@ export const useGameState = () => {
         };
       }
 
-      // Reset insurance monthly
+      // Insurance persists - no longer reset monthly
       return {
         ...prev,
         month: newMonth,
         gamePhase: 'summary',
         currentEvent: null,
-        hasInsurance: false,
         monthHistory: [...prev.monthHistory, record],
       };
     });
@@ -229,6 +254,8 @@ export const useGameState = () => {
     handleEvent,
     saveMoney,
     buyInsurance,
+    updateInsurance,
+    stopInsurance,
     takeLoan,
     repayLoan,
     endMonth,

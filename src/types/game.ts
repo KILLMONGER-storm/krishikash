@@ -5,6 +5,7 @@ export interface GameState {
   savings: number;
   stabilityScore: number;
   hasInsurance: boolean;
+  insuranceAmount: number;
   debt: number;
   consecutiveSavingMonths: number;
   totalSavedThisStreak: number;
@@ -60,6 +61,7 @@ export const INITIAL_GAME_STATE: GameState = {
   savings: 0,
   stabilityScore: 70,
   hasInsurance: false,
+  insuranceAmount: 0,
   debt: 0,
   consecutiveSavingMonths: 0,
   totalSavedThisStreak: 0,
@@ -69,6 +71,7 @@ export const INITIAL_GAME_STATE: GameState = {
 };
 
 export const GAME_EVENTS: GameEvent[] = [
+  // Cost events (12 events)
   {
     id: 'medical_1',
     type: 'medical',
@@ -82,6 +85,13 @@ export const GAME_EVENTS: GameEvent[] = [
     title: 'Hospital Visit',
     description: 'Your child needs medical attention and medicines.',
     cost: 1500,
+  },
+  {
+    id: 'medical_3',
+    type: 'medical',
+    title: 'Accident Injury',
+    description: 'You hurt yourself while working and need treatment.',
+    cost: 1800,
   },
   {
     id: 'crop_loss_1',
@@ -98,18 +108,11 @@ export const GAME_EVENTS: GameEvent[] = [
     cost: 2500,
   },
   {
-    id: 'good_rain_1',
-    type: 'good_rain',
-    title: 'Excellent Harvest',
-    description: 'Good rainfall blessed your fields with a bumper crop!',
-    reward: 2500,
-  },
-  {
-    id: 'good_rain_2',
-    type: 'good_rain',
-    title: 'Premium Crop Sale',
-    description: 'Your high-quality produce fetched excellent prices at the market.',
-    reward: 3000,
+    id: 'crop_loss_3',
+    type: 'crop_loss',
+    title: 'Flood Damage',
+    description: 'Heavy rains flooded your fields and ruined crops.',
+    cost: 3500,
   },
   {
     id: 'festival_1',
@@ -119,11 +122,47 @@ export const GAME_EVENTS: GameEvent[] = [
     cost: 1500,
   },
   {
+    id: 'festival_2',
+    type: 'festival',
+    title: 'Wedding in Family',
+    description: 'A relative\'s wedding requires contribution and gifts.',
+    cost: 2500,
+  },
+  {
     id: 'equipment_1',
     type: 'equipment',
     title: 'Tool Repair',
     description: 'Your farming equipment needs urgent repair.',
     cost: 1000,
+  },
+  {
+    id: 'equipment_2',
+    type: 'equipment',
+    title: 'Pump Breakdown',
+    description: 'Your water pump broke and needs replacement parts.',
+    cost: 2000,
+  },
+  {
+    id: 'equipment_3',
+    type: 'equipment',
+    title: 'Tractor Service',
+    description: 'Your tractor requires immediate servicing.',
+    cost: 1500,
+  },
+  {
+    id: 'medical_4',
+    type: 'medical',
+    title: 'Medicine Costs',
+    description: 'Monthly medicines for elderly parents are needed.',
+    cost: 800,
+  },
+  // Reward events (4 events)
+  {
+    id: 'good_rain_1',
+    type: 'good_rain',
+    title: 'Excellent Harvest',
+    description: 'Good rainfall blessed your fields with a bumper crop!',
+    reward: 2500,
   },
   {
     id: 'bonus_1',
@@ -132,6 +171,14 @@ export const GAME_EVENTS: GameEvent[] = [
     description: 'You received a farming subsidy from the government.',
     reward: 2000,
   },
+  {
+    id: 'bonus_2',
+    type: 'bonus',
+    title: 'Crop Bonus',
+    description: 'You got a bonus for delivering quality produce.',
+    reward: 1500,
+  },
+  // Loan offer event
   {
     id: 'loan_offer_1',
     type: 'loan_offer',
