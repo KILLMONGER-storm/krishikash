@@ -17,6 +17,7 @@ export const GameContainer = () => {
     saveMoney,
     buyInsurance,
     takeLoan,
+    repayLoan,
     endMonth,
     continueToNextMonth,
     getGameResult,
@@ -77,6 +78,7 @@ export const GameContainer = () => {
               onSave={saveMoney}
               onBuyInsurance={buyInsurance}
               onTakeLoan={takeLoan}
+              onRepayLoan={repayLoan}
               onEndMonth={endMonth}
             />
           </div>

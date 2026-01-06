@@ -141,20 +141,18 @@ export const useGameState = () => {
     });
   }, []);
 
-  const checkIncomeGrowth = useCallback(() => {
+  const repayLoan = useCallback((amount: number) => {
     setGameState(prev => {
-      // If saved 2000+ for 3 consecutive months
-      if (prev.consecutiveSavingMonths >= 3 && prev.totalSavedThisStreak >= 6000) {
-        return {
-          ...prev,
-          monthlyIncome: prev.monthlyIncome + 1500,
-          stabilityScore: Math.min(100, prev.stabilityScore + 10),
-          consecutiveSavingMonths: 0,
-          totalSavedThisStreak: 0,
-          savings: prev.savings - 6000, // Use savings for investment
-        };
-      }
-      return prev;
+      if (prev.balance < amount || amount <= 0 || prev.debt <= 0) return prev;
+      
+      const repayAmount = Math.min(amount, prev.debt);
+      
+      return {
+        ...prev,
+        balance: prev.balance - repayAmount,
+        debt: prev.debt - repayAmount,
+        stabilityScore: Math.min(100, prev.stabilityScore + 5),
+      };
     });
   }, []);
 
@@ -171,22 +169,10 @@ export const useGameState = () => {
       };
 
       const newMonth = prev.month + 1;
-      
-      // Check for income growth
-      let updatedState = { ...prev };
-      if (prev.consecutiveSavingMonths >= 3 && prev.totalSavedThisStreak >= 6000) {
-        updatedState = {
-          ...updatedState,
-          monthlyIncome: prev.monthlyIncome + 1500,
-          stabilityScore: Math.min(100, prev.stabilityScore + 10),
-          consecutiveSavingMonths: 0,
-          totalSavedThisStreak: 0,
-        };
-      }
 
       if (newMonth > 12) {
         return {
-          ...updatedState,
+          ...prev,
           month: 12,
           gamePhase: 'ended',
           currentEvent: null,
@@ -196,7 +182,7 @@ export const useGameState = () => {
 
       // Reset insurance monthly
       return {
-        ...updatedState,
+        ...prev,
         month: newMonth,
         gamePhase: 'summary',
         currentEvent: null,
@@ -244,10 +230,10 @@ export const useGameState = () => {
     saveMoney,
     buyInsurance,
     takeLoan,
+    repayLoan,
     endMonth,
     continueToNextMonth,
     getGameResult,
     getTotalExpenses,
-    checkIncomeGrowth,
   };
 };
