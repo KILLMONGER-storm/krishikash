@@ -16,6 +16,8 @@ export const GameContainer = () => {
     handleEvent,
     saveMoney,
     buyInsurance,
+    updateInsurance,
+    stopInsurance,
     takeLoan,
     repayLoan,
     endMonth,
@@ -74,9 +76,12 @@ export const GameContainer = () => {
             <DecisionPanel
               balance={gameState.balance}
               hasInsurance={gameState.hasInsurance}
+              insuranceAmount={gameState.insuranceAmount}
               debt={gameState.debt}
               onSave={saveMoney}
               onBuyInsurance={buyInsurance}
+              onUpdateInsurance={updateInsurance}
+              onStopInsurance={stopInsurance}
               onTakeLoan={takeLoan}
               onRepayLoan={repayLoan}
               onEndMonth={endMonth}

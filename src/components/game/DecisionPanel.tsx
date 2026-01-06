@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { PiggyBank, Shield, Banknote, ArrowRight, CreditCard } from 'lucide-react';
+import { PiggyBank, Shield, Banknote, ArrowRight, CreditCard, ShieldOff, ShieldPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DecisionPanelProps {
   balance: number;
   hasInsurance: boolean;
+  insuranceAmount: number;
   debt: number;
   onSave: (amount: number) => void;
-  onBuyInsurance: () => void;
+  onBuyInsurance: (amount: number) => void;
+  onUpdateInsurance: (amount: number) => void;
+  onStopInsurance: () => void;
   onTakeLoan: (amount: number) => void;
   onRepayLoan: (amount: number) => void;
   onEndMonth: () => void;
@@ -16,9 +19,12 @@ interface DecisionPanelProps {
 export const DecisionPanel = ({
   balance,
   hasInsurance,
+  insuranceAmount,
   debt,
   onSave,
   onBuyInsurance,
+  onUpdateInsurance,
+  onStopInsurance,
   onTakeLoan,
   onRepayLoan,
   onEndMonth,
@@ -26,8 +32,10 @@ export const DecisionPanel = ({
   const [saveAmount, setSaveAmount] = useState(2000);
   const [showLoanConfirm, setShowLoanConfirm] = useState(false);
   const [repayAmount, setRepayAmount] = useState<number | null>(null);
+  const [selectedInsuranceAmount, setSelectedInsuranceAmount] = useState(500);
 
   const savingOptions = [1000, 2000, 3000, 5000];
+  const insuranceOptions = [500, 750, 1000];
   const loanAmount = 5000;
 
   return (
@@ -80,32 +88,84 @@ export const DecisionPanel = ({
       </div>
 
       {/* Insurance Section */}
-      <div className="game-card">
+      <div className={cn("game-card", hasInsurance && "border-blue-300 bg-blue-50/50")}>
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
             <Shield className="w-5 h-5 text-blue-600" />
           </div>
           <div className="flex-1">
             <h3 className="font-bold text-foreground">Crop Insurance</h3>
-            <p className="text-xs text-muted-foreground">Protect against crop loss (₹500/month)</p>
+            <p className="text-xs text-muted-foreground">
+              {hasInsurance 
+                ? `Auto-deducts ₹${insuranceAmount}/month` 
+                : 'Protect against crop loss'}
+            </p>
           </div>
           {hasInsurance && (
             <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold">
-              Active
+              ₹{insuranceAmount}/mo
             </span>
           )}
         </div>
 
-        <button
-          onClick={onBuyInsurance}
-          disabled={hasInsurance || balance < 500}
-          className={cn(
-            'btn-game w-full bg-blue-500 text-white hover:bg-blue-600',
-            (hasInsurance || balance < 500) && 'opacity-50 cursor-not-allowed'
-          )}
-        >
-          {hasInsurance ? '✓ Already Insured' : 'Buy Insurance - ₹500'}
-        </button>
+        {!hasInsurance ? (
+          <>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              {insuranceOptions.map((amount) => (
+                <button
+                  key={amount}
+                  onClick={() => setSelectedInsuranceAmount(amount)}
+                  className={cn(
+                    'py-2 px-3 rounded-lg text-sm font-semibold transition-all',
+                    selectedInsuranceAmount === amount
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-muted text-muted-foreground hover:bg-blue-100'
+                  )}
+                >
+                  ₹{amount}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => onBuyInsurance(selectedInsuranceAmount)}
+              disabled={balance < selectedInsuranceAmount}
+              className={cn(
+                'btn-game w-full bg-blue-500 text-white hover:bg-blue-600',
+                balance < selectedInsuranceAmount && 'opacity-50 cursor-not-allowed'
+              )}
+            >
+              Start Insurance - ₹{selectedInsuranceAmount}
+            </button>
+          </>
+        ) : (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              {insuranceOptions.map((amount) => (
+                <button
+                  key={amount}
+                  onClick={() => onUpdateInsurance(amount)}
+                  disabled={amount === insuranceAmount}
+                  className={cn(
+                    'py-2 px-3 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1',
+                    amount === insuranceAmount
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-muted text-muted-foreground hover:bg-blue-100'
+                  )}
+                >
+                  {amount > insuranceAmount && <ShieldPlus className="w-3 h-3" />}
+                  ₹{amount}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={onStopInsurance}
+              className="btn-game w-full bg-red-100 text-red-700 border-2 border-red-300 hover:bg-red-200 flex items-center justify-center gap-2"
+            >
+              <ShieldOff className="w-4 h-4" />
+              Stop Insurance
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Loan Repayment Section - Shows when debt exists */}
