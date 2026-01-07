@@ -32,7 +32,7 @@ export const GameContainer = () => {
     loadGameState,
   } = useGameState();
 
-  const { saveGame, isLoggedIn } = useGameSave();
+  const { saveGame, isLoggedIn, isSaving } = useGameSave();
   const prevMonthRef = useRef(gameState.month);
 
   // Auto-save after each month ends (when month changes and user is logged in)
@@ -76,6 +76,7 @@ export const GameContainer = () => {
           savings={gameState.savings}
           gameState={gameState}
           onLoadGame={loadGameState}
+          isSaving={isSaving}
         />
 
         {/* Dashboard view */}
