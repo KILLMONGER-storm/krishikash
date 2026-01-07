@@ -1,5 +1,6 @@
 import { useGameState } from '@/hooks/useGameState';
 import { IntroScreen } from './IntroScreen';
+import { GoalSelectionScreen } from './GoalSelectionScreen';
 import { Dashboard } from './Dashboard';
 import { EventCard } from './EventCard';
 import { DecisionPanel } from './DecisionPanel';
@@ -12,6 +13,7 @@ export const GameContainer = () => {
     gameState,
     resetGame,
     startGame,
+    selectGoal,
     startNewMonth,
     handleEvent,
     saveMoney,
@@ -20,6 +22,7 @@ export const GameContainer = () => {
     stopInsurance,
     takeLoan,
     repayLoan,
+    purchaseGoal,
     endMonth,
     continueToNextMonth,
     getGameResult,
@@ -30,6 +33,11 @@ export const GameContainer = () => {
     return <IntroScreen onStart={startGame} />;
   }
 
+  // Goal selection screen
+  if (gameState.gamePhase === 'goal_selection') {
+    return <GoalSelectionScreen onSelectGoal={selectGoal} />;
+  }
+
   // Game ended screen
   if (gameState.gamePhase === 'ended') {
     return (
@@ -37,6 +45,7 @@ export const GameContainer = () => {
         gameState={gameState}
         result={getGameResult()}
         onRestart={resetGame}
+        onPurchaseGoal={purchaseGoal}
       />
     );
   }
@@ -45,7 +54,12 @@ export const GameContainer = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto px-4 pb-8">
-        <GameHeader month={gameState.month} onReset={resetGame} />
+        <GameHeader 
+          month={gameState.month} 
+          onReset={resetGame}
+          selectedGoal={gameState.selectedGoal}
+          savings={gameState.savings}
+        />
 
         {/* Dashboard view */}
         {gameState.gamePhase === 'playing' && (
@@ -78,6 +92,7 @@ export const GameContainer = () => {
               hasInsurance={gameState.hasInsurance}
               insuranceAmount={gameState.insuranceAmount}
               debt={gameState.debt}
+              loanMonthsRemaining={gameState.loanMonthsRemaining}
               onSave={saveMoney}
               onBuyInsurance={buyInsurance}
               onUpdateInsurance={updateInsurance}

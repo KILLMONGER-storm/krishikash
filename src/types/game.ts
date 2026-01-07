@@ -1,3 +1,17 @@
+export interface GameGoal {
+  id: string;
+  name: string;
+  cost: number;
+  emoji: string;
+}
+
+export const GAME_GOALS: GameGoal[] = [
+  { id: 'cycle', name: 'Cycle', cost: 7000, emoji: '🚲' },
+  { id: 'motorbike', name: 'Motorbike', cost: 300000, emoji: '🏍️' },
+  { id: 'car', name: 'Car', cost: 1200000, emoji: '🚗' },
+  { id: 'house', name: 'New House', cost: 2000000, emoji: '🏠' },
+];
+
 export interface GameState {
   month: number;
   balance: number;
@@ -7,11 +21,15 @@ export interface GameState {
   hasInsurance: boolean;
   insuranceAmount: number;
   debt: number;
+  loanMonthsRemaining: number;
   consecutiveSavingMonths: number;
   totalSavedThisStreak: number;
-  gamePhase: 'intro' | 'playing' | 'event' | 'decision' | 'summary' | 'ended';
+  gamePhase: 'intro' | 'goal_selection' | 'playing' | 'event' | 'decision' | 'summary' | 'ended';
   currentEvent: GameEvent | null;
   monthHistory: MonthRecord[];
+  selectedGoal: GameGoal | null;
+  goalAchieved: boolean;
+  propertyConfiscated: boolean;
 }
 
 export interface GameEvent {
@@ -63,15 +81,18 @@ export const INITIAL_GAME_STATE: GameState = {
   hasInsurance: false,
   insuranceAmount: 0,
   debt: 0,
+  loanMonthsRemaining: 0,
   consecutiveSavingMonths: 0,
   totalSavedThisStreak: 0,
   gamePhase: 'intro',
   currentEvent: null,
   monthHistory: [],
+  selectedGoal: null,
+  goalAchieved: false,
+  propertyConfiscated: false,
 };
 
 export const GAME_EVENTS: GameEvent[] = [
-  // Cost events (12 events)
   {
     id: 'medical_1',
     type: 'medical',
@@ -156,7 +177,6 @@ export const GAME_EVENTS: GameEvent[] = [
     description: 'Monthly medicines for elderly parents are needed.',
     cost: 800,
   },
-  // Reward events (4 events)
   {
     id: 'good_rain_1',
     type: 'good_rain',
@@ -178,7 +198,6 @@ export const GAME_EVENTS: GameEvent[] = [
     description: 'You got a bonus for delivering quality produce.',
     reward: 1500,
   },
-  // Loan offer event
   {
     id: 'loan_offer_1',
     type: 'loan_offer',

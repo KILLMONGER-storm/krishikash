@@ -1,28 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
-import { GameState, GameEvent, INITIAL_GAME_STATE, FIXED_EXPENSES, GAME_EVENTS, MonthRecord } from '@/types/game';
+import { GameState, GameEvent, INITIAL_GAME_STATE, FIXED_EXPENSES, GAME_EVENTS, MonthRecord, GameGoal } from '@/types/game';
 
 const STORAGE_KEY = 'krishicash_game_state';
+const LOAN_INTEREST_RATE = 0.05;
+const MAX_LOAN_MONTHS = 6;
 
-// Calculate stability score based on multiple financial factors (pure function - no hooks)
 const calculateStability = (state: GameState): number => {
   const monthlyExpenses = FIXED_EXPENSES.household + FIXED_EXPENSES.farming + FIXED_EXPENSES.education;
   
-  // Balance score (0-25 points): positive balance is good
   const balanceRatio = state.balance / monthlyExpenses;
   const balanceScore = Math.min(25, Math.max(0, balanceRatio * 12.5 + 12.5));
   
-  // Savings score (0-30 points): more savings = more stability
   const savingsMonths = state.savings / monthlyExpenses;
   const savingsScore = Math.min(30, savingsMonths * 10);
   
-  // Debt score (0-25 points): less debt = more stability
   const debtRatio = state.debt / state.monthlyIncome;
   const debtScore = Math.max(0, 25 - (debtRatio * 15));
   
-  // Insurance score (0-10 points): having insurance adds stability
   const insuranceScore = state.hasInsurance ? 10 : 0;
   
-  // Financial flexibility score (0-10 points): ability to handle emergencies
   const netWorth = state.balance + state.savings - state.debt;
   const flexibilityRatio = netWorth / monthlyExpenses;
   const flexibilityScore = Math.min(10, Math.max(0, flexibilityRatio * 5 + 5));
@@ -45,7 +41,6 @@ export const useGameState = () => {
     return INITIAL_GAME_STATE;
   });
 
-  // Persist to localStorage
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
   }, [gameState]);
@@ -58,6 +53,14 @@ export const useGameState = () => {
   const startGame = useCallback(() => {
     setGameState(prev => ({
       ...prev,
+      gamePhase: 'goal_selection',
+    }));
+  }, []);
+
+  const selectGoal = useCallback((goal: GameGoal) => {
+    setGameState(prev => ({
+      ...prev,
+      selectedGoal: goal,
       gamePhase: 'playing',
     }));
   }, []);
@@ -73,27 +76,37 @@ export const useGameState = () => {
 
   const startNewMonth = useCallback(() => {
     setGameState(prev => {
+      if (prev.debt > 0 && prev.loanMonthsRemaining <= 0) {
+        return {
+          ...prev,
+          propertyConfiscated: true,
+          gamePhase: 'ended',
+        };
+      }
+
       const newBalance = prev.balance + prev.monthlyIncome;
       const expenses = getTotalExpenses();
       let balanceAfterExpenses = newBalance - expenses;
       
-      // Auto-deduct insurance if active
       if (prev.hasInsurance && prev.insuranceAmount > 0) {
         balanceAfterExpenses -= prev.insuranceAmount;
       }
       
-      // Deduct debt EMI if any
-      let debtPayment = 0;
+      let newDebt = prev.debt;
+      let newLoanMonths = prev.loanMonthsRemaining;
+      
       if (prev.debt > 0) {
-        debtPayment = Math.min(prev.debt / 6, balanceAfterExpenses > 0 ? prev.debt / 6 : 0);
+        newDebt = prev.debt * (1 + LOAN_INTEREST_RATE);
+        newLoanMonths = prev.loanMonthsRemaining - 1;
       }
 
       const event = getRandomEvent();
       
       return {
         ...prev,
-        balance: balanceAfterExpenses - debtPayment,
-        debt: Math.max(0, prev.debt - debtPayment),
+        balance: balanceAfterExpenses,
+        debt: Math.round(newDebt),
+        loanMonthsRemaining: newLoanMonths,
         currentEvent: event,
         gamePhase: 'event',
       };
@@ -105,7 +118,6 @@ export const useGameState = () => {
       let newBalance = prev.balance;
       let effectiveCost = event.cost || 0;
 
-      // Insurance reduces crop loss cost
       if (event.type === 'crop_loss' && prev.hasInsurance) {
         effectiveCost = Math.min(500, effectiveCost);
       }
@@ -191,11 +203,13 @@ export const useGameState = () => {
 
   const takeLoan = useCallback((amount: number) => {
     setGameState(prev => {
-      const interest = amount * 0.2;
+      if (prev.debt > 0) return prev;
+      
       const newState = {
         ...prev,
         balance: prev.balance + amount,
-        debt: prev.debt + amount + interest,
+        debt: amount,
+        loanMonthsRemaining: MAX_LOAN_MONTHS,
       };
 
       return {
@@ -210,15 +224,37 @@ export const useGameState = () => {
       if (prev.balance < amount || amount <= 0 || prev.debt <= 0) return prev;
       
       const repayAmount = Math.min(amount, prev.debt);
+      const newDebt = prev.debt - repayAmount;
+      
       const newState = {
         ...prev,
         balance: prev.balance - repayAmount,
-        debt: prev.debt - repayAmount,
+        debt: newDebt,
+        loanMonthsRemaining: newDebt <= 0 ? 0 : prev.loanMonthsRemaining,
       };
 
       return {
         ...newState,
         stabilityScore: calculateStability(newState),
+      };
+    });
+  }, []);
+
+  const purchaseGoal = useCallback(() => {
+    setGameState(prev => {
+      if (!prev.selectedGoal) return prev;
+      if (prev.savings < prev.selectedGoal.cost) return prev;
+      
+      const finalValue = Math.round(prev.selectedGoal.cost * 1.1);
+      
+      return {
+        ...prev,
+        savings: prev.savings - prev.selectedGoal.cost,
+        goalAchieved: true,
+        selectedGoal: {
+          ...prev.selectedGoal,
+          cost: finalValue,
+        },
       };
     });
   }, []);
@@ -247,7 +283,6 @@ export const useGameState = () => {
         };
       }
 
-      // Insurance persists - no longer reset monthly
       return {
         ...prev,
         month: newMonth,
@@ -266,10 +301,36 @@ export const useGameState = () => {
   }, []);
 
   const getGameResult = useCallback(() => {
+    if (gameState.propertyConfiscated) {
+      return {
+        title: 'Property Confiscated! 💔',
+        description: 'You couldn\'t repay your loan within 6 months. Your property has been seized.',
+        color: 'destructive' as const,
+      };
+    }
+
+    if (gameState.goalAchieved && gameState.selectedGoal) {
+      return {
+        title: `Congratulations! You bought a ${gameState.selectedGoal.name}! ${gameState.selectedGoal.emoji}`,
+        description: `Amazing! Your ${gameState.selectedGoal.name} is now worth ₹${gameState.selectedGoal.cost.toLocaleString()} (10% appreciation)!`,
+        color: 'success' as const,
+      };
+    }
+
+    if (gameState.selectedGoal && gameState.savings >= gameState.selectedGoal.cost) {
+      return {
+        title: `Goal Achieved! ${gameState.selectedGoal.emoji}`,
+        description: `You saved enough to buy a ${gameState.selectedGoal.name}! You can now purchase it.`,
+        color: 'success' as const,
+      };
+    }
+
     if (gameState.stabilityScore > 80) {
       return {
         title: 'Financially Secure Farmer! 🌟',
-        description: 'Excellent! You managed your finances wisely and built a stable future.',
+        description: gameState.selectedGoal 
+          ? `Great progress! You need ₹${(gameState.selectedGoal.cost - gameState.savings).toLocaleString()} more for your ${gameState.selectedGoal.name}.`
+          : 'Excellent! You managed your finances wisely and built a stable future.',
         color: 'success' as const,
       };
     } else if (gameState.stabilityScore > 50) {
@@ -285,12 +346,13 @@ export const useGameState = () => {
         color: 'destructive' as const,
       };
     }
-  }, [gameState.stabilityScore]);
+  }, [gameState.stabilityScore, gameState.selectedGoal, gameState.savings, gameState.goalAchieved, gameState.propertyConfiscated]);
 
   return {
     gameState,
     resetGame,
     startGame,
+    selectGoal,
     startNewMonth,
     handleEvent,
     saveMoney,
@@ -299,6 +361,7 @@ export const useGameState = () => {
     stopInsurance,
     takeLoan,
     repayLoan,
+    purchaseGoal,
     endMonth,
     continueToNextMonth,
     getGameResult,

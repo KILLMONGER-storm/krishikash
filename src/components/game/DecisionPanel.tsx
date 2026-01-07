@@ -7,6 +7,7 @@ interface DecisionPanelProps {
   hasInsurance: boolean;
   insuranceAmount: number;
   debt: number;
+  loanMonthsRemaining: number;
   onSave: (amount: number) => void;
   onBuyInsurance: (amount: number) => void;
   onUpdateInsurance: (amount: number) => void;
@@ -21,6 +22,7 @@ export const DecisionPanel = ({
   hasInsurance,
   insuranceAmount,
   debt,
+  loanMonthsRemaining,
   onSave,
   onBuyInsurance,
   onUpdateInsurance,
@@ -170,17 +172,19 @@ export const DecisionPanel = ({
 
       {/* Loan Repayment Section - Shows when debt exists */}
       {debt > 0 && (
-        <div className="game-card border-green-300 bg-green-50/50">
+        <div className="game-card border-red-300 bg-red-50/50">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-              <CreditCard className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+              <CreditCard className="w-5 h-5 text-red-600" />
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-foreground">Repay Loan</h3>
-              <p className="text-xs text-green-600">Clear your debt to improve stability!</p>
+              <p className="text-xs text-red-600">
+                ⚠️ {loanMonthsRemaining} months left! 5% monthly interest
+              </p>
             </div>
             <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
-              Debt: ₹{debt.toLocaleString()}
+              ₹{debt.toLocaleString()}
             </span>
           </div>
 
