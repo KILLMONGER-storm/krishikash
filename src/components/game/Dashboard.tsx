@@ -11,7 +11,10 @@ interface DashboardProps {
 }
 
 export const Dashboard = ({ gameState, onStartMonth }: DashboardProps) => {
-  const totalExpenses = FIXED_EXPENSES.household + FIXED_EXPENSES.farming + FIXED_EXPENSES.education;
+  const householdExpenses = Math.round(FIXED_EXPENSES.household * gameState.expenseMultiplier);
+  const farmingExpenses = Math.round(FIXED_EXPENSES.farming * gameState.expenseMultiplier);
+  const educationExpenses = Math.round(FIXED_EXPENSES.education * gameState.expenseMultiplier);
+  const totalExpenses = householdExpenses + farmingExpenses + educationExpenses;
 
   return (
     <div className="space-y-6 animate-slide-up">
@@ -67,15 +70,15 @@ export const Dashboard = ({ gameState, onStartMonth }: DashboardProps) => {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Household Expenses</span>
-            <span className="font-semibold text-foreground">{formatIndianCurrency(FIXED_EXPENSES.household)}</span>
+            <span className="font-semibold text-foreground">{formatIndianCurrency(householdExpenses)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Farming Costs</span>
-            <span className="font-semibold text-foreground">{formatIndianCurrency(FIXED_EXPENSES.farming)}</span>
+            <span className="font-semibold text-foreground">{formatIndianCurrency(farmingExpenses)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Education</span>
-            <span className="font-semibold text-foreground">{formatIndianCurrency(FIXED_EXPENSES.education)}</span>
+            <span className="font-semibold text-foreground">{formatIndianCurrency(educationExpenses)}</span>
           </div>
           <div className="border-t border-border pt-2 mt-2">
             <div className="flex justify-between font-bold">
