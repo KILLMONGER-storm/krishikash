@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
 import { GameState } from '@/types/game';
+import { formatIndianCurrency } from '@/lib/utils';
 
 interface MonthSummaryProps {
   gameState: GameState;
@@ -35,7 +36,7 @@ export const MonthSummary = ({ gameState, onContinue }: MonthSummaryProps) => {
             <span className="text-muted-foreground">Balance Change</span>
             <span className={`flex items-center gap-1 font-bold ${balanceChange >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
               {balanceChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-              {balanceChange >= 0 ? '+' : ''}₹{balanceChange.toLocaleString()}
+              {balanceChange >= 0 ? '+' : ''}{formatIndianCurrency(balanceChange)}
             </span>
           </div>
 
@@ -43,18 +44,18 @@ export const MonthSummary = ({ gameState, onContinue }: MonthSummaryProps) => {
             <span className="text-muted-foreground">Savings Change</span>
             <span className={`flex items-center gap-1 font-bold ${savingsChange >= 0 ? 'text-emerald-600' : 'text-muted-foreground'}`}>
               {savingsChange > 0 && <TrendingUp className="w-4 h-4" />}
-              {savingsChange > 0 ? '+' : ''}₹{savingsChange.toLocaleString()}
+              {savingsChange > 0 ? '+' : ''}{formatIndianCurrency(savingsChange)}
             </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">Current Balance</span>
-            <span className="font-bold text-foreground">₹{gameState.balance.toLocaleString()}</span>
+            <span className="font-bold text-foreground">{formatIndianCurrency(gameState.balance)}</span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">Total Savings</span>
-            <span className="font-bold text-emerald-600">₹{gameState.savings.toLocaleString()}</span>
+            <span className="font-bold text-emerald-600">{formatIndianCurrency(gameState.savings)}</span>
           </div>
 
           <div className="flex justify-between items-center">
@@ -76,10 +77,10 @@ export const MonthSummary = ({ gameState, onContinue }: MonthSummaryProps) => {
       <div className="game-card bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
         <p className="text-sm font-semibold text-amber-800 mb-2">💡 Tip</p>
         <p className="text-sm text-amber-700">
-          {gameState.savings < 5000 && 'Try to save at least ₹2,000 each month to unlock income bonuses!'}
-          {gameState.savings >= 5000 && gameState.savings < 10000 && 'Great savings! Keep going to reach ₹10,000 for extra stability.'}
-          {gameState.savings >= 10000 && 'Excellent savings! You\'re building a strong financial cushion.'}
-          {gameState.debt > 0 && ' Remember to pay off your debt to improve your stability score.'}
+          {gameState.savings < 100000 && 'Try to save at least ₹25,000 each month to build your emergency fund!'}
+          {gameState.savings >= 100000 && gameState.savings < 500000 && 'Great savings! Keep going to reach ₹5,00,000 for extra stability.'}
+          {gameState.savings >= 500000 && 'Excellent savings! You\'re building a strong financial cushion.'}
+          {gameState.debt > 0 && ' Remember to pay off your debt to avoid property confiscation.'}
         </p>
       </div>
 

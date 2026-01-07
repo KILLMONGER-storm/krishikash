@@ -3,6 +3,7 @@ import { StatsCard } from './StatsCard';
 import { ProgressBar } from './ProgressBar';
 import { MonthIndicator } from './MonthIndicator';
 import { GameState, FIXED_EXPENSES } from '@/types/game';
+import { formatIndianCurrency } from '@/lib/utils';
 
 interface DashboardProps {
   gameState: GameState;
@@ -66,20 +67,20 @@ export const Dashboard = ({ gameState, onStartMonth }: DashboardProps) => {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Household Expenses</span>
-            <span className="font-semibold text-foreground">₹{FIXED_EXPENSES.household.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">{formatIndianCurrency(FIXED_EXPENSES.household)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Farming Costs</span>
-            <span className="font-semibold text-foreground">₹{FIXED_EXPENSES.farming.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">{formatIndianCurrency(FIXED_EXPENSES.farming)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Education</span>
-            <span className="font-semibold text-foreground">₹{FIXED_EXPENSES.education.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">{formatIndianCurrency(FIXED_EXPENSES.education)}</span>
           </div>
           <div className="border-t border-border pt-2 mt-2">
             <div className="flex justify-between font-bold">
               <span className="text-foreground">Total Expenses</span>
-              <span className="text-red-600">₹{totalExpenses.toLocaleString()}</span>
+              <span className="text-red-600">{formatIndianCurrency(totalExpenses)}</span>
             </div>
           </div>
         </div>
@@ -107,9 +108,9 @@ export const Dashboard = ({ gameState, onStartMonth }: DashboardProps) => {
               <span className="font-bold text-emerald-700">Savings Streak!</span>
               <p className="text-xs text-emerald-600">
                 {gameState.consecutiveSavingMonths} month{gameState.consecutiveSavingMonths > 1 ? 's' : ''} saved | 
-                ₹{gameState.totalSavedThisStreak.toLocaleString()} total
+                {formatIndianCurrency(gameState.totalSavedThisStreak)} total
               </p>
-              {gameState.consecutiveSavingMonths >= 3 && gameState.totalSavedThisStreak >= 6000 && (
+              {gameState.consecutiveSavingMonths >= 3 && gameState.totalSavedThisStreak >= 75000 && (
                 <p className="text-xs text-emerald-700 font-bold mt-1">
                   🌟 Income boost coming next month!
                 </p>

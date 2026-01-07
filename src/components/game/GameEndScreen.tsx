@@ -1,6 +1,6 @@
 import { Trophy, RefreshCw, Star, TrendingUp, PiggyBank, AlertTriangle, ShoppingCart } from 'lucide-react';
 import { GameState } from '@/types/game';
-import { cn } from '@/lib/utils';
+import { cn, formatIndianCurrency } from '@/lib/utils';
 
 interface GameEndScreenProps {
   gameState: GameState;
@@ -32,17 +32,17 @@ export const GameEndScreen = ({ gameState, result, onRestart, onPurchaseGoal }: 
 
   const lessons = [
     {
-      condition: gameState.savings >= 10000,
+      condition: gameState.savings >= 200000,
       positive: true,
       text: 'Excellent savings! You built a strong financial cushion.',
     },
     {
-      condition: gameState.savings < 5000,
+      condition: gameState.savings < 100000,
       positive: false,
       text: 'Try to save more regularly to build emergency funds.',
     },
     {
-      condition: gameState.monthlyIncome > 12000,
+      condition: gameState.monthlyIncome > 150000,
       positive: true,
       text: 'Your consistent saving unlocked income growth!',
     },
@@ -102,12 +102,12 @@ export const GameEndScreen = ({ gameState, result, onRestart, onPurchaseGoal }: 
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-3 rounded-xl bg-amber-50">
               <PiggyBank className="w-6 h-6 text-amber-600 mx-auto mb-1" />
-              <div className="text-xl font-bold text-amber-700">₹{gameState.savings.toLocaleString()}</div>
+              <div className="text-lg font-bold text-amber-700">{formatIndianCurrency(gameState.savings)}</div>
               <div className="text-xs text-amber-600">Total Savings</div>
             </div>
             <div className="text-center p-3 rounded-xl bg-emerald-50">
               <TrendingUp className="w-6 h-6 text-emerald-600 mx-auto mb-1" />
-              <div className="text-xl font-bold text-emerald-700">₹{gameState.monthlyIncome.toLocaleString()}</div>
+              <div className="text-lg font-bold text-emerald-700">{formatIndianCurrency(gameState.monthlyIncome)}</div>
               <div className="text-xs text-emerald-600">Final Income</div>
             </div>
             <div className="text-center p-3 rounded-xl bg-blue-50">
@@ -117,7 +117,7 @@ export const GameEndScreen = ({ gameState, result, onRestart, onPurchaseGoal }: 
             </div>
             <div className="text-center p-3 rounded-xl bg-red-50">
               <AlertTriangle className="w-6 h-6 text-red-600 mx-auto mb-1" />
-              <div className="text-xl font-bold text-red-700">₹{gameState.debt.toLocaleString()}</div>
+              <div className="text-lg font-bold text-red-700">{formatIndianCurrency(gameState.debt)}</div>
               <div className="text-xs text-red-600">Remaining Debt</div>
             </div>
           </div>

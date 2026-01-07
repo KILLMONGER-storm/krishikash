@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { PiggyBank, Shield, Banknote, ArrowRight, CreditCard, ShieldOff, ShieldPlus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatIndianCurrency } from '@/lib/utils';
 
 interface DecisionPanelProps {
   balance: number;
@@ -31,14 +31,14 @@ export const DecisionPanel = ({
   onRepayLoan,
   onEndMonth,
 }: DecisionPanelProps) => {
-  const [saveAmount, setSaveAmount] = useState(2000);
+  const [saveAmount, setSaveAmount] = useState(25000);
   const [showLoanConfirm, setShowLoanConfirm] = useState(false);
   const [repayAmount, setRepayAmount] = useState<number | null>(null);
-  const [selectedInsuranceAmount, setSelectedInsuranceAmount] = useState(500);
+  const [selectedInsuranceAmount, setSelectedInsuranceAmount] = useState(5000);
 
-  const savingOptions = [1000, 2000, 3000, 5000];
-  const insuranceOptions = [500, 750, 1000];
-  const loanAmount = 5000;
+  const savingOptions = [10000, 25000, 50000, 75000];
+  const insuranceOptions = [5000, 7500, 10000];
+  const loanAmount = 50000;
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -60,13 +60,13 @@ export const DecisionPanel = ({
               key={amount}
               onClick={() => setSaveAmount(amount)}
               className={cn(
-                'py-2 px-3 rounded-lg text-sm font-semibold transition-all',
+                'py-2 px-2 rounded-lg text-xs font-semibold transition-all',
                 saveAmount === amount
                   ? 'bg-emerald-500 text-white'
                   : 'bg-muted text-muted-foreground hover:bg-emerald-100'
               )}
             >
-              ₹{amount.toLocaleString()}
+              {formatIndianCurrency(amount)}
             </button>
           ))}
         </div>
@@ -79,7 +79,7 @@ export const DecisionPanel = ({
             balance < saveAmount && 'opacity-50 cursor-not-allowed'
           )}
         >
-          Save ₹{saveAmount.toLocaleString()}
+          Save {formatIndianCurrency(saveAmount)}
         </button>
         
         {balance < saveAmount && (
@@ -99,13 +99,13 @@ export const DecisionPanel = ({
             <h3 className="font-bold text-foreground">Crop Insurance</h3>
             <p className="text-xs text-muted-foreground">
               {hasInsurance 
-                ? `Auto-deducts ₹${insuranceAmount}/month` 
+                ? `Auto-deducts ${formatIndianCurrency(insuranceAmount)}/month` 
                 : 'Protect against crop loss'}
             </p>
           </div>
           {hasInsurance && (
             <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold">
-              ₹{insuranceAmount}/mo
+              {formatIndianCurrency(insuranceAmount)}/mo
             </span>
           )}
         </div>
@@ -118,13 +118,13 @@ export const DecisionPanel = ({
                   key={amount}
                   onClick={() => setSelectedInsuranceAmount(amount)}
                   className={cn(
-                    'py-2 px-3 rounded-lg text-sm font-semibold transition-all',
+                    'py-2 px-2 rounded-lg text-xs font-semibold transition-all',
                     selectedInsuranceAmount === amount
                       ? 'bg-blue-500 text-white'
                       : 'bg-muted text-muted-foreground hover:bg-blue-100'
                   )}
                 >
-                  ₹{amount}
+                  {formatIndianCurrency(amount)}
                 </button>
               ))}
             </div>
@@ -136,7 +136,7 @@ export const DecisionPanel = ({
                 balance < selectedInsuranceAmount && 'opacity-50 cursor-not-allowed'
               )}
             >
-              Start Insurance - ₹{selectedInsuranceAmount}
+              Start Insurance - {formatIndianCurrency(selectedInsuranceAmount)}
             </button>
           </>
         ) : (
@@ -148,14 +148,14 @@ export const DecisionPanel = ({
                   onClick={() => onUpdateInsurance(amount)}
                   disabled={amount === insuranceAmount}
                   className={cn(
-                    'py-2 px-3 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1',
+                    'py-2 px-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1',
                     amount === insuranceAmount
                       ? 'bg-blue-500 text-white'
                       : 'bg-muted text-muted-foreground hover:bg-blue-100'
                   )}
                 >
                   {amount > insuranceAmount && <ShieldPlus className="w-3 h-3" />}
-                  ₹{amount}
+                  {formatIndianCurrency(amount)}
                 </button>
               ))}
             </div>
@@ -184,36 +184,36 @@ export const DecisionPanel = ({
               </p>
             </div>
             <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
-              ₹{debt.toLocaleString()}
+              {formatIndianCurrency(debt)}
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 mb-3">
             <button
-              onClick={() => setRepayAmount(Math.min(1000, debt, balance))}
-              disabled={balance < 1000 || debt < 1000}
+              onClick={() => setRepayAmount(Math.min(10000, debt, balance))}
+              disabled={balance < 10000 || debt < 10000}
               className={cn(
                 'py-2 px-3 rounded-lg text-sm font-semibold transition-all',
-                repayAmount === Math.min(1000, debt, balance)
+                repayAmount === Math.min(10000, debt, balance)
                   ? 'bg-green-500 text-white'
                   : 'bg-muted text-muted-foreground hover:bg-green-100',
-                (balance < 1000 || debt < 1000) && 'opacity-50 cursor-not-allowed'
+                (balance < 10000 || debt < 10000) && 'opacity-50 cursor-not-allowed'
               )}
             >
-              ₹1,000
+              ₹10,000
             </button>
             <button
-              onClick={() => setRepayAmount(Math.min(2000, debt, balance))}
-              disabled={balance < 2000 || debt < 2000}
+              onClick={() => setRepayAmount(Math.min(25000, debt, balance))}
+              disabled={balance < 25000 || debt < 25000}
               className={cn(
                 'py-2 px-3 rounded-lg text-sm font-semibold transition-all',
-                repayAmount === Math.min(2000, debt, balance)
+                repayAmount === Math.min(25000, debt, balance)
                   ? 'bg-green-500 text-white'
                   : 'bg-muted text-muted-foreground hover:bg-green-100',
-                (balance < 2000 || debt < 2000) && 'opacity-50 cursor-not-allowed'
+                (balance < 25000 || debt < 25000) && 'opacity-50 cursor-not-allowed'
               )}
             >
-              ₹2,000
+              ₹25,000
             </button>
             <button
               onClick={() => setRepayAmount(Math.min(debt, balance))}
@@ -226,7 +226,7 @@ export const DecisionPanel = ({
                 balance <= 0 && 'opacity-50 cursor-not-allowed'
               )}
             >
-              Full: ₹{Math.min(debt, balance).toLocaleString()}
+              Full: {formatIndianCurrency(Math.min(debt, balance))}
             </button>
           </div>
 
@@ -243,7 +243,7 @@ export const DecisionPanel = ({
               (!repayAmount || balance < repayAmount) && 'opacity-50 cursor-not-allowed'
             )}
           >
-            {repayAmount ? `Repay ₹${repayAmount.toLocaleString()}` : 'Select amount to repay'}
+            {repayAmount ? `Repay ${formatIndianCurrency(repayAmount)}` : 'Select amount to repay'}
           </button>
         </div>
       )}
@@ -257,7 +257,7 @@ export const DecisionPanel = ({
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-foreground">Quick Loan</h3>
-              <p className="text-xs text-red-500">⚠️ 20% interest - Use with caution!</p>
+              <p className="text-xs text-red-500">⚠️ 5% monthly interest - Use with caution!</p>
             </div>
           </div>
 
@@ -266,12 +266,12 @@ export const DecisionPanel = ({
               onClick={() => setShowLoanConfirm(true)}
               className="btn-game w-full bg-red-100 text-red-700 border-2 border-red-300 hover:bg-red-200"
             >
-              Take Loan - ₹{loanAmount.toLocaleString()}
+              Take Loan - {formatIndianCurrency(loanAmount)}
             </button>
           ) : (
             <div className="space-y-2">
               <p className="text-sm text-red-600 text-center font-medium">
-                You will repay ₹{(loanAmount * 1.2).toLocaleString()} total. Are you sure?
+                5% interest added monthly. Repay within 6 months or lose property!
               </p>
               <div className="flex gap-2">
                 <button
