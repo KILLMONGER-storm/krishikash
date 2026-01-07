@@ -363,6 +363,11 @@ export const useGameState = () => {
     }
   }, [gameState.stabilityScore, gameState.selectedGoal, gameState.savings, gameState.goalAchieved, gameState.propertyConfiscated]);
 
+  const loadGameState = useCallback((state: GameState) => {
+    setGameState(state);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, []);
+
   return {
     gameState,
     resetGame,
@@ -381,5 +386,6 @@ export const useGameState = () => {
     continueToNextMonth,
     getGameResult,
     getTotalExpenses,
+    loadGameState,
   };
 };
