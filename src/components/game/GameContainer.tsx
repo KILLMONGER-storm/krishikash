@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react';
 import { useGameState } from '@/hooks/useGameState';
+import { useGameSave } from '@/hooks/useGameSave';
 import { IntroScreen } from './IntroScreen';
 import { GoalSelectionScreen } from './GoalSelectionScreen';
 import { Dashboard } from './Dashboard';
@@ -29,6 +31,17 @@ export const GameContainer = () => {
     getGameResult,
     loadGameState,
   } = useGameState();
+
+  const { saveGame, isLoggedIn } = useGameSave();
+  const prevMonthRef = useRef(gameState.month);
+
+  // Auto-save after each month ends (when month changes and user is logged in)
+  useEffect(() => {
+    if (isLoggedIn && gameState.month !== prevMonthRef.current && gameState.gamePhase === 'playing') {
+      saveGame(gameState);
+    }
+    prevMonthRef.current = gameState.month;
+  }, [gameState.month, gameState.gamePhase, isLoggedIn, saveGame, gameState]);
 
   // Intro screen
   if (gameState.gamePhase === 'intro') {
