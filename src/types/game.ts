@@ -1,3 +1,41 @@
+export type DifficultyLevel = 'easy' | 'medium' | 'hard';
+
+export interface DifficultyConfig {
+  id: DifficultyLevel;
+  name: string;
+  description: string;
+  monthlyIncome: number;
+  expenseMultiplier: number;
+  emoji: string;
+}
+
+export const DIFFICULTY_LEVELS: DifficultyConfig[] = [
+  { 
+    id: 'easy', 
+    name: 'Beginner Farmer', 
+    description: 'Higher income, lower expenses',
+    monthlyIncome: 200000,
+    expenseMultiplier: 0.8,
+    emoji: '🌱'
+  },
+  { 
+    id: 'medium', 
+    name: 'Experienced Farmer', 
+    description: 'Balanced income and expenses',
+    monthlyIncome: 150000,
+    expenseMultiplier: 1.0,
+    emoji: '🌾'
+  },
+  { 
+    id: 'hard', 
+    name: 'Struggling Farmer', 
+    description: 'Lower income, higher expenses',
+    monthlyIncome: 100000,
+    expenseMultiplier: 1.3,
+    emoji: '🥵'
+  },
+];
+
 export interface GameGoal {
   id: string;
   name: string;
@@ -30,6 +68,8 @@ export interface GameState {
   selectedGoal: GameGoal | null;
   goalAchieved: boolean;
   propertyConfiscated: boolean;
+  difficulty: DifficultyLevel;
+  expenseMultiplier: number;
 }
 
 export interface GameEvent {
@@ -77,7 +117,7 @@ export const INITIAL_GAME_STATE: GameState = {
   balance: 0,
   monthlyIncome: 150000,
   savings: 0,
-  stabilityScore: 70,
+  stabilityScore: 55,
   hasInsurance: false,
   insuranceAmount: 0,
   debt: 0,
@@ -90,6 +130,8 @@ export const INITIAL_GAME_STATE: GameState = {
   selectedGoal: null,
   goalAchieved: false,
   propertyConfiscated: false,
+  difficulty: 'medium',
+  expenseMultiplier: 1.0,
 };
 
 export const GAME_EVENTS: GameEvent[] = [
