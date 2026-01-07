@@ -1,5 +1,5 @@
 import { GameEvent } from '@/types/game';
-import { cn } from '@/lib/utils';
+import { cn, formatIndianCurrency } from '@/lib/utils';
 import { AlertTriangle, CloudRain, Heart, Gift, Wrench, Coins, BadgeDollarSign } from 'lucide-react';
 
 interface EventCardProps {
@@ -47,8 +47,8 @@ export const EventCard = ({ event, hasInsurance, onContinue }: EventCardProps) =
   let insuranceSaved = 0;
   
   if (event.type === 'crop_loss' && hasInsurance && event.cost) {
-    insuranceSaved = event.cost - 500;
-    effectiveCost = 500;
+    insuranceSaved = event.cost - 5000;
+    effectiveCost = 5000;
   }
 
   return (
@@ -77,20 +77,20 @@ export const EventCard = ({ event, hasInsurance, onContinue }: EventCardProps) =
             'text-2xl font-bold mb-4',
             isPositive ? 'text-emerald-600' : 'text-red-600'
           )}>
-            {isPositive ? '+' : '-'}₹{(event.reward || effectiveCost).toLocaleString()}
+            {isPositive ? '+' : '-'}{formatIndianCurrency(event.reward || effectiveCost)}
           </div>
         )}
 
         {insuranceSaved > 0 && (
           <div className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg mb-4 text-sm font-semibold">
-            🛡️ Insurance saved you ₹{insuranceSaved.toLocaleString()}!
+            🛡️ Insurance saved you {formatIndianCurrency(insuranceSaved)}!
           </div>
         )}
 
         {isLoanOffer && (
           <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg mb-4 text-sm">
             <AlertTriangle className="inline w-4 h-4 mr-1" />
-            Warning: {event.interest}% interest rate!
+            Warning: {event.interest}% monthly interest rate!
           </div>
         )}
 

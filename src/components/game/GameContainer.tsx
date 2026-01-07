@@ -7,6 +7,7 @@ import { DecisionPanel } from './DecisionPanel';
 import { MonthSummary } from './MonthSummary';
 import { GameEndScreen } from './GameEndScreen';
 import { GameHeader } from './GameHeader';
+import { formatIndianCurrency } from '@/lib/utils';
 
 export const GameContainer = () => {
   const {
@@ -84,7 +85,7 @@ export const GameContainer = () => {
             <div className="text-center">
               <h2 className="text-xl font-bold text-foreground">Make Your Decisions</h2>
               <p className="text-sm text-muted-foreground">
-                Balance: ₹{gameState.balance.toLocaleString()}
+                Balance: {formatIndianCurrency(gameState.balance)}
               </p>
             </div>
             <DecisionPanel

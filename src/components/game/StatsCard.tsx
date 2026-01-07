@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, formatIndianCurrency } from '@/lib/utils';
 
 interface StatsCardProps {
   label: string;
@@ -35,8 +35,8 @@ export const StatsCard = ({ label, value, icon, variant = 'default', className }
       <div className={cn('text-2xl mb-1', textStyles[variant])}>
         {icon}
       </div>
-      <div className={cn('text-xl font-bold', textStyles[variant])}>
-        {typeof value === 'number' ? `₹${value.toLocaleString()}` : value}
+      <div className={cn('text-lg font-bold', textStyles[variant])}>
+        {typeof value === 'number' ? formatIndianCurrency(value) : value}
       </div>
       <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
         {label}

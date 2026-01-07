@@ -1,5 +1,6 @@
 import { GameGoal, GAME_GOALS } from '@/types/game';
 import { Target } from 'lucide-react';
+import { formatIndianCurrency } from '@/lib/utils';
 
 interface GoalSelectionScreenProps {
   onSelectGoal: (goal: GameGoal) => void;
@@ -35,7 +36,7 @@ export const GoalSelectionScreen = ({ onSelectGoal }: GoalSelectionScreenProps) 
                     {goal.name}
                   </h3>
                   <p className="text-lg font-semibold text-primary">
-                    ₹{goal.cost.toLocaleString()}
+                    {formatIndianCurrency(goal.cost)}
                   </p>
                 </div>
                 <div className="text-muted-foreground group-hover:text-primary transition-colors">

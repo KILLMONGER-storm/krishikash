@@ -73,7 +73,7 @@ export const IntroScreen = ({ onStart }: IntroScreenProps) => {
           <p className="text-sm font-semibold text-foreground mb-2">You'll start with:</p>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="text-muted-foreground">Monthly Income:</div>
-            <div className="font-bold text-primary">₹12,000</div>
+            <div className="font-bold text-primary">₹1,50,000</div>
             <div className="text-muted-foreground">Starting Stability:</div>
             <div className="font-bold text-blue-600">70/100</div>
           </div>
