@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { GameState } from '@/types/game';
 import { useAuth } from './useAuth';
@@ -7,9 +7,12 @@ import { Json } from '@/integrations/supabase/types';
 
 export const useGameSave = () => {
   const { user } = useAuth();
+  const [isSaving, setIsSaving] = useState(false);
 
   const saveGame = useCallback(async (gameState: GameState) => {
     if (!user) return { error: new Error('Not logged in') };
+
+    setIsSaving(true);
 
     const saveData = {
       user_id: user.id,
@@ -38,6 +41,7 @@ export const useGameSave = () => {
       });
     }
 
+    setIsSaving(false);
     return { error };
   }, [user]);
 
@@ -87,5 +91,5 @@ export const useGameSave = () => {
     }
   }, [user]);
 
-  return { saveGame, loadGame, deleteSave, isLoggedIn: !!user };
+  return { saveGame, loadGame, deleteSave, isLoggedIn: !!user, isSaving };
 };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sprout, RotateCcw, Target, Save, LogIn, LogOut, User } from 'lucide-react';
+import { Sprout, RotateCcw, Target, Save, LogIn, LogOut, User, Cloud } from 'lucide-react';
 import { GameGoal, GameState } from '@/types/game';
 import { useAuth } from '@/hooks/useAuth';
 import { useGameSave } from '@/hooks/useGameSave';
@@ -12,9 +12,10 @@ interface GameHeaderProps {
   savings?: number;
   gameState?: GameState;
   onLoadGame?: (state: GameState) => void;
+  isSaving?: boolean;
 }
 
-export const GameHeader = ({ month, onReset, selectedGoal, savings = 0, gameState, onLoadGame }: GameHeaderProps) => {
+export const GameHeader = ({ month, onReset, selectedGoal, savings = 0, gameState, onLoadGame, isSaving = false }: GameHeaderProps) => {
   const progress = selectedGoal ? Math.min(100, (savings / selectedGoal.cost) * 100) : 0;
   const [showAuth, setShowAuth] = useState(false);
   const { user, signOut, loading } = useAuth();
@@ -45,6 +46,11 @@ export const GameHeader = ({ month, onReset, selectedGoal, savings = 0, gameStat
           </div>
           
           <div className="flex items-center gap-2">
+            {isSaving && (
+              <div className="flex items-center gap-1 text-primary animate-pulse" title="Saving...">
+                <Cloud className="w-4 h-4" />
+              </div>
+            )}
             <span className="text-sm font-semibold text-muted-foreground">
               Month {month}/12
             </span>
