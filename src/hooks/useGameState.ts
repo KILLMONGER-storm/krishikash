@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { GameState, GameEvent, INITIAL_GAME_STATE, FIXED_EXPENSES, GAME_EVENTS, MonthRecord, GameGoal } from '@/types/game';
+import { GameState, GameEvent, INITIAL_GAME_STATE, FIXED_EXPENSES, GAME_EVENTS, MonthRecord, GameGoal, DifficultyLevel, DIFFICULTY_LEVELS } from '@/types/game';
 import { toast } from '@/hooks/use-toast';
 
 const STORAGE_KEY = 'krishicash_game_state';
@@ -51,9 +51,13 @@ export const useGameState = () => {
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
-  const startGame = useCallback(() => {
+  const startGame = useCallback((difficultyId: DifficultyLevel) => {
+    const difficulty = DIFFICULTY_LEVELS.find(d => d.id === difficultyId) || DIFFICULTY_LEVELS[1];
     setGameState(prev => ({
       ...prev,
+      monthlyIncome: difficulty.monthlyIncome,
+      difficulty: difficulty.id,
+      expenseMultiplier: difficulty.expenseMultiplier,
       gamePhase: 'goal_selection',
     }));
   }, []);
@@ -66,8 +70,9 @@ export const useGameState = () => {
     }));
   }, []);
 
-  const getTotalExpenses = useCallback(() => {
-    return FIXED_EXPENSES.household + FIXED_EXPENSES.farming + FIXED_EXPENSES.education;
+  const getTotalExpenses = useCallback((multiplier: number = 1) => {
+    const base = FIXED_EXPENSES.household + FIXED_EXPENSES.farming + FIXED_EXPENSES.education;
+    return Math.round(base * multiplier);
   }, []);
 
   const getRandomEvent = useCallback((): GameEvent => {
@@ -86,7 +91,7 @@ export const useGameState = () => {
       }
 
       const newBalance = prev.balance + prev.monthlyIncome;
-      const expenses = getTotalExpenses();
+      const expenses = getTotalExpenses(prev.expenseMultiplier);
       let balanceAfterExpenses = newBalance - expenses;
       
       if (prev.hasInsurance && prev.insuranceAmount > 0) {
@@ -274,7 +279,7 @@ export const useGameState = () => {
       const record: MonthRecord = {
         month: prev.month,
         income: prev.monthlyIncome,
-        expenses: getTotalExpenses(),
+        expenses: getTotalExpenses(prev.expenseMultiplier),
         savings: prev.savings,
         balance: prev.balance,
         event: prev.currentEvent || undefined,

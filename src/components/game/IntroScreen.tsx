@@ -1,7 +1,9 @@
 import { Sprout, Target, TrendingUp, Shield } from 'lucide-react';
+import { DifficultyLevel, DIFFICULTY_LEVELS } from '@/types/game';
+import { formatIndianCurrency } from '@/lib/utils';
 
 interface IntroScreenProps {
-  onStart: () => void;
+  onStart: (difficulty: DifficultyLevel) => void;
 }
 
 export const IntroScreen = ({ onStart }: IntroScreenProps) => {
@@ -55,27 +57,35 @@ export const IntroScreen = ({ onStart }: IntroScreenProps) => {
           </div>
         </div>
 
-        {/* Start Game */}
-        <div className="space-y-3">
-          <button
-            onClick={onStart}
-            className="btn-primary-game w-full text-lg py-4"
-          >
-            Start Your Journey 🌾
-          </button>
-          <p className="text-xs text-muted-foreground">
-            Learn financial skills through real-life scenarios
-          </p>
+        {/* Difficulty Selection */}
+        <div className="game-card text-left">
+          <h2 className="font-bold text-lg mb-4 text-center text-foreground">Choose Difficulty</h2>
+          <div className="space-y-3">
+            {DIFFICULTY_LEVELS.map((level) => (
+              <button
+                key={level.id}
+                onClick={() => onStart(level.id)}
+                className="w-full p-4 rounded-xl border-2 border-border hover:border-primary transition-all bg-card hover:bg-accent/50 text-left group"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{level.emoji}</span>
+                  <div className="flex-1">
+                    <p className="font-bold text-foreground group-hover:text-primary transition-colors">{level.name}</p>
+                    <p className="text-sm text-muted-foreground">{level.description}</p>
+                    <p className="text-xs text-primary mt-1">Income: {formatIndianCurrency(level.monthlyIncome)}/month</p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Starting Stats */}
         <div className="game-card bg-secondary/50">
           <p className="text-sm font-semibold text-foreground mb-2">You'll start with:</p>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="text-muted-foreground">Monthly Income:</div>
-            <div className="font-bold text-primary">₹1,50,000</div>
             <div className="text-muted-foreground">Starting Stability:</div>
-            <div className="font-bold text-blue-600">70/100</div>
+            <div className="font-bold text-blue-600">55/100</div>
           </div>
         </div>
       </div>
