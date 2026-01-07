@@ -1,4 +1,4 @@
-import { Trophy, RefreshCw, Star, TrendingUp, PiggyBank, AlertTriangle } from 'lucide-react';
+import { Trophy, RefreshCw, Star, TrendingUp, PiggyBank, AlertTriangle, ShoppingCart } from 'lucide-react';
 import { GameState } from '@/types/game';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +10,7 @@ interface GameEndScreenProps {
     color: 'success' | 'warning' | 'destructive';
   };
   onRestart: () => void;
+  onPurchaseGoal?: () => void;
 }
 
 const colorStyles = {
@@ -24,7 +25,11 @@ const iconColors = {
   destructive: 'text-red-600',
 };
 
-export const GameEndScreen = ({ gameState, result, onRestart }: GameEndScreenProps) => {
+export const GameEndScreen = ({ gameState, result, onRestart, onPurchaseGoal }: GameEndScreenProps) => {
+  const canPurchaseGoal = gameState.selectedGoal && 
+    gameState.savings >= gameState.selectedGoal.cost && 
+    !gameState.goalAchieved;
+
   const lessons = [
     {
       condition: gameState.savings >= 10000,
@@ -56,6 +61,11 @@ export const GameEndScreen = ({ gameState, result, onRestart }: GameEndScreenPro
       positive: true,
       text: 'You maintained excellent financial stability throughout!',
     },
+    {
+      condition: gameState.propertyConfiscated,
+      positive: false,
+      text: 'Always repay loans within 6 months to avoid losing your property.',
+    },
   ].filter(l => l.condition);
 
   return (
@@ -74,6 +84,17 @@ export const GameEndScreen = ({ gameState, result, onRestart }: GameEndScreenPro
             {result.description}
           </p>
         </div>
+
+        {/* Purchase Goal Button */}
+        {canPurchaseGoal && onPurchaseGoal && (
+          <button
+            onClick={onPurchaseGoal}
+            className="btn-primary-game w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            Buy {gameState.selectedGoal?.name} {gameState.selectedGoal?.emoji}
+          </button>
+        )}
 
         {/* Final Stats */}
         <div className="game-card">
