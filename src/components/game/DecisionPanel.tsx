@@ -4,6 +4,7 @@ import { cn, formatIndianCurrency } from '@/lib/utils';
 
 interface DecisionPanelProps {
   balance: number;
+  savings: number;
   hasInsurance: boolean;
   insuranceAmount: number;
   debt: number;
@@ -14,11 +15,13 @@ interface DecisionPanelProps {
   onStopInsurance: () => void;
   onTakeLoan: (amount: number) => void;
   onRepayLoan: (amount: number) => void;
+  onWithdrawFromSavings: (amount: number) => void;
   onEndMonth: () => void;
 }
 
 export const DecisionPanel = ({
   balance,
+  savings,
   hasInsurance,
   insuranceAmount,
   debt,
@@ -29,12 +32,17 @@ export const DecisionPanel = ({
   onStopInsurance,
   onTakeLoan,
   onRepayLoan,
+  onWithdrawFromSavings,
   onEndMonth,
 }: DecisionPanelProps) => {
   const [saveAmount, setSaveAmount] = useState(25000);
   const [showLoanConfirm, setShowLoanConfirm] = useState(false);
   const [repayAmount, setRepayAmount] = useState<number | null>(null);
   const [selectedInsuranceAmount, setSelectedInsuranceAmount] = useState(5000);
+
+  const totalAvailable = balance + savings;
+  const needsMoreToClearDebt = debt > balance && savings > 0;
+  const shortfall = debt - balance;
 
   const savingOptions = [10000, 25000, 50000, 75000];
   const insuranceOptions = [5000, 7500, 10000];
@@ -188,6 +196,21 @@ export const DecisionPanel = ({
             </span>
           </div>
 
+          {/* Withdraw from savings hint */}
+          {needsMoreToClearDebt && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+              <p className="text-xs text-amber-700">
+                💡 You have {formatIndianCurrency(savings)} in savings. Withdraw to pay off the full debt!
+              </p>
+              <button
+                onClick={() => onWithdrawFromSavings(Math.min(shortfall, savings))}
+                className="mt-2 w-full py-2 px-3 rounded-lg text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-all"
+              >
+                Withdraw {formatIndianCurrency(Math.min(shortfall, savings))} from Savings
+              </button>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-2 mb-3">
             <button
               onClick={() => setRepayAmount(Math.min(10000, debt, balance))}
@@ -226,7 +249,10 @@ export const DecisionPanel = ({
                 balance <= 0 && 'opacity-50 cursor-not-allowed'
               )}
             >
-              Full: {formatIndianCurrency(Math.min(debt, balance))}
+              {balance >= debt 
+                ? `Clear Full Debt: ${formatIndianCurrency(debt)}` 
+                : `Pay Max: ${formatIndianCurrency(balance)} (need ${formatIndianCurrency(shortfall)} more)`
+              }
             </button>
           </div>
 

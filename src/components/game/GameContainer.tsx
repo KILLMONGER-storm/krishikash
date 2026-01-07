@@ -25,6 +25,7 @@ export const GameContainer = () => {
     stopInsurance,
     takeLoan,
     repayLoan,
+    withdrawFromSavings,
     purchaseGoal,
     endMonth,
     continueToNextMonth,
@@ -107,6 +108,7 @@ export const GameContainer = () => {
             </div>
             <DecisionPanel
               balance={gameState.balance}
+              savings={gameState.savings}
               hasInsurance={gameState.hasInsurance}
               insuranceAmount={gameState.insuranceAmount}
               debt={gameState.debt}
@@ -117,6 +119,7 @@ export const GameContainer = () => {
               onStopInsurance={stopInsurance}
               onTakeLoan={takeLoan}
               onRepayLoan={repayLoan}
+              onWithdrawFromSavings={withdrawFromSavings}
               onEndMonth={endMonth}
             />
           </div>

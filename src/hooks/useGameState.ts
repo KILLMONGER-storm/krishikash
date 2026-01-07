@@ -255,6 +255,25 @@ export const useGameState = () => {
     });
   }, []);
 
+  const withdrawFromSavings = useCallback((amount: number) => {
+    setGameState(prev => {
+      if (prev.savings < amount || amount <= 0) return prev;
+
+      const newState = {
+        ...prev,
+        savings: prev.savings - amount,
+        balance: prev.balance + amount,
+        consecutiveSavingMonths: 0,
+        totalSavedThisStreak: 0,
+      };
+
+      return {
+        ...newState,
+        stabilityScore: calculateStability(newState),
+      };
+    });
+  }, []);
+
   const purchaseGoal = useCallback(() => {
     setGameState(prev => {
       if (!prev.selectedGoal) return prev;
@@ -381,6 +400,7 @@ export const useGameState = () => {
     stopInsurance,
     takeLoan,
     repayLoan,
+    withdrawFromSavings,
     purchaseGoal,
     endMonth,
     continueToNextMonth,
