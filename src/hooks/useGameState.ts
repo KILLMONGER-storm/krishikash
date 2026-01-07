@@ -3,6 +3,35 @@ import { GameState, GameEvent, INITIAL_GAME_STATE, FIXED_EXPENSES, GAME_EVENTS, 
 
 const STORAGE_KEY = 'krishicash_game_state';
 
+// Calculate stability score based on multiple financial factors (pure function - no hooks)
+const calculateStability = (state: GameState): number => {
+  const monthlyExpenses = FIXED_EXPENSES.household + FIXED_EXPENSES.farming + FIXED_EXPENSES.education;
+  
+  // Balance score (0-25 points): positive balance is good
+  const balanceRatio = state.balance / monthlyExpenses;
+  const balanceScore = Math.min(25, Math.max(0, balanceRatio * 12.5 + 12.5));
+  
+  // Savings score (0-30 points): more savings = more stability
+  const savingsMonths = state.savings / monthlyExpenses;
+  const savingsScore = Math.min(30, savingsMonths * 10);
+  
+  // Debt score (0-25 points): less debt = more stability
+  const debtRatio = state.debt / state.monthlyIncome;
+  const debtScore = Math.max(0, 25 - (debtRatio * 15));
+  
+  // Insurance score (0-10 points): having insurance adds stability
+  const insuranceScore = state.hasInsurance ? 10 : 0;
+  
+  // Financial flexibility score (0-10 points): ability to handle emergencies
+  const netWorth = state.balance + state.savings - state.debt;
+  const flexibilityRatio = netWorth / monthlyExpenses;
+  const flexibilityScore = Math.min(10, Math.max(0, flexibilityRatio * 5 + 5));
+  
+  const totalScore = balanceScore + savingsScore + debtScore + insuranceScore + flexibilityScore;
+  
+  return Math.round(Math.min(100, Math.max(0, totalScore)));
+};
+
 export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -40,35 +69,6 @@ export const useGameState = () => {
   const getRandomEvent = useCallback((): GameEvent => {
     const randomIndex = Math.floor(Math.random() * GAME_EVENTS.length);
     return { ...GAME_EVENTS[randomIndex] };
-  }, []);
-
-  // Calculate stability score based on multiple financial factors
-  const calculateStability = useCallback((state: GameState): number => {
-    const monthlyExpenses = FIXED_EXPENSES.household + FIXED_EXPENSES.farming + FIXED_EXPENSES.education;
-    
-    // Balance score (0-25 points): positive balance is good
-    const balanceRatio = state.balance / monthlyExpenses;
-    const balanceScore = Math.min(25, Math.max(0, balanceRatio * 12.5 + 12.5));
-    
-    // Savings score (0-30 points): more savings = more stability
-    const savingsMonths = state.savings / monthlyExpenses; // how many months of expenses covered
-    const savingsScore = Math.min(30, savingsMonths * 10);
-    
-    // Debt score (0-25 points): less debt = more stability
-    const debtRatio = state.debt / state.monthlyIncome;
-    const debtScore = Math.max(0, 25 - (debtRatio * 15));
-    
-    // Insurance score (0-10 points): having insurance adds stability
-    const insuranceScore = state.hasInsurance ? 10 : 0;
-    
-    // Financial flexibility score (0-10 points): ability to handle emergencies
-    const netWorth = state.balance + state.savings - state.debt;
-    const flexibilityRatio = netWorth / monthlyExpenses;
-    const flexibilityScore = Math.min(10, Math.max(0, flexibilityRatio * 5 + 5));
-    
-    const totalScore = balanceScore + savingsScore + debtScore + insuranceScore + flexibilityScore;
-    
-    return Math.round(Math.min(100, Math.max(0, totalScore)));
   }, []);
 
   const startNewMonth = useCallback(() => {
@@ -129,7 +129,7 @@ export const useGameState = () => {
         stabilityScore: calculateStability(newState),
       };
     });
-  }, [calculateStability]);
+  }, []);
 
   const saveMoney = useCallback((amount: number) => {
     setGameState(prev => {
@@ -148,7 +148,7 @@ export const useGameState = () => {
         stabilityScore: calculateStability(newState),
       };
     });
-  }, [calculateStability]);
+  }, []);
 
   const buyInsurance = useCallback((amount: number = 500) => {
     setGameState(prev => {
@@ -166,7 +166,7 @@ export const useGameState = () => {
         stabilityScore: calculateStability(newState),
       };
     });
-  }, [calculateStability]);
+  }, []);
 
   const updateInsurance = useCallback((newAmount: number) => {
     setGameState(prev => {
@@ -203,7 +203,7 @@ export const useGameState = () => {
         stabilityScore: calculateStability(newState),
       };
     });
-  }, [calculateStability]);
+  }, []);
 
   const repayLoan = useCallback((amount: number) => {
     setGameState(prev => {
@@ -221,7 +221,7 @@ export const useGameState = () => {
         stabilityScore: calculateStability(newState),
       };
     });
-  }, [calculateStability]);
+  }, []);
 
   const endMonth = useCallback(() => {
     setGameState(prev => {
