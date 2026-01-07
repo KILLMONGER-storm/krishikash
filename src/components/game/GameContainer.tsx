@@ -27,6 +27,7 @@ export const GameContainer = () => {
     endMonth,
     continueToNextMonth,
     getGameResult,
+    loadGameState,
   } = useGameState();
 
   // Intro screen
@@ -60,6 +61,8 @@ export const GameContainer = () => {
           onReset={resetGame}
           selectedGoal={gameState.selectedGoal}
           savings={gameState.savings}
+          gameState={gameState}
+          onLoadGame={loadGameState}
         />
 
         {/* Dashboard view */}

@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      game_saves: {
+        Row: {
+          created_at: string
+          difficulty: string
+          game_state: Json
+          goal_name: string | null
+          id: string
+          month: number
+          savings: number
+          stability_score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string
+          game_state: Json
+          goal_name?: string | null
+          id?: string
+          month?: number
+          savings?: number
+          stability_score?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string
+          game_state?: Json
+          goal_name?: string | null
+          id?: string
+          month?: number
+          savings?: number
+          stability_score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
