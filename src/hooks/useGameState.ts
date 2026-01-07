@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { GameState, GameEvent, INITIAL_GAME_STATE, FIXED_EXPENSES, GAME_EVENTS, MonthRecord, GameGoal } from '@/types/game';
+import { toast } from '@/hooks/use-toast';
 
 const STORAGE_KEY = 'krishicash_game_state';
 const LOAN_INTEREST_RATE = 0.05;
@@ -98,6 +99,15 @@ export const useGameState = () => {
       if (prev.debt > 0) {
         newDebt = prev.debt * (1 + LOAN_INTEREST_RATE);
         newLoanMonths = prev.loanMonthsRemaining - 1;
+        
+        // Show warning when 2 months remaining
+        if (newLoanMonths === 2) {
+          toast({
+            title: "⚠️ Loan Warning!",
+            description: "Only 2 months left to repay your loan! Your property will be confiscated if not paid.",
+            variant: "destructive",
+          });
+        }
       }
 
       const event = getRandomEvent();

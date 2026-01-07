@@ -75,7 +75,7 @@ export const FIXED_EXPENSES: FixedExpenses = {
 export const INITIAL_GAME_STATE: GameState = {
   month: 1,
   balance: 0,
-  monthlyIncome: 12000,
+  monthlyIncome: 150000,
   savings: 0,
   stabilityScore: 70,
   hasInsurance: false,
